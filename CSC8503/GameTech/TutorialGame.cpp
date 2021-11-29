@@ -566,9 +566,14 @@ void TutorialGame::MoveSelectedObject() {
 				*world->GetMainCamera());
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
-				if (closestCollision.node == selectionObject) {
+				/*if (closestCollision.node == selectionObject) {
 					selectionObject->GetPhysicsObject()->
 						AddForce(ray.GetDirection() * forceMagnitude);
+				}*/
+				if (closestCollision.node == selectionObject) {
+					selectionObject->GetPhysicsObject()->AddForceAtPosition(
+						ray.GetDirection() * forceMagnitude,
+						closestCollision.collidedAt);
 				}
 			}
 		}
