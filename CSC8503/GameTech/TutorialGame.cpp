@@ -4,7 +4,7 @@
 #include "../../Plugins/OpenGLRendering/OGLShader.h"
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
-
+#include "../CSC8503Common/Constraint.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -248,9 +248,10 @@ void TutorialGame::InitWorld() {
 	InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	InitGameExamples();
 	InitDefaultFloor();
+	BridgeConstraintTest();
 }
 
-/*void TutorialGame::BridgeConstraintTest() {
+void TutorialGame::BridgeConstraintTest() {
 	Vector3 cubeSize = Vector3(8, 8, 8);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
@@ -258,7 +259,7 @@ void TutorialGame::InitWorld() {
 	float maxDistance = 30; // constraint distance
 	float cubeDistance = 20; // distance between links
 
-	Vector3 startPos = Vector3(500, 500, 500);
+	Vector3 startPos = Vector3(0, 10, 0);
 
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0)
 		, cubeSize, 0);
@@ -274,12 +275,11 @@ void TutorialGame::InitWorld() {
 			block, maxDistance);
 		world->AddConstraint(constraint);
 		previous = block;
-
 	}
 	PositionConstraint* constraint = new PositionConstraint(previous,
 		end, maxDistance);
 	world->AddConstraint(constraint);
-}*/
+}
 
 /*
 
