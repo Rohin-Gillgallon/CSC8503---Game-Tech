@@ -1,7 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
-
+#include "Ray.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 
@@ -27,6 +27,19 @@ namespace NCL {
 
 			bool IsActive() const {
 				return isActive;
+			}
+
+			Ray CreateRay() {
+				GameObject* obj = this;
+				return Ray(Position(), Forward());
+			}
+
+			Vector3 Forward() {
+				return transform.GetForward();
+			}
+
+			Vector3 Position() {
+				return transform.GetPosition();
 			}
 
 			Transform& GetTransform() {
@@ -83,7 +96,6 @@ namespace NCL {
 			bool	isActive;
 			int		worldID;
 			string	name;
-
 			Vector3 broadphaseAABB;
 		};
 	}

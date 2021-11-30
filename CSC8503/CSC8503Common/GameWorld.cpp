@@ -70,7 +70,7 @@ void GameWorld::UpdateWorld(float dt) {
 	}
 }
 
-bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject) const {
+bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, GameObject* self) const {
 	//The simplest raycast just goes through each object and sees if there's a collision
 	RayCollision collision;
 
@@ -78,6 +78,10 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 		if (!i->GetBoundingVolume()) { //objects might not be collideable etc...
 			continue;
 		}
+		if (i == self) {
+			continue;
+		}
+
 		RayCollision thisCollision;
 		if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
 				

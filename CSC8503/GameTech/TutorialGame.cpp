@@ -505,18 +505,38 @@ bool TutorialGame::SelectObject() {
 				selectionObject = nullptr;
 				lockedObject	= nullptr;
 			}
-
+			
+			if (selectionObject2) {	//set colour to deselected;
+				selectionObject2->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
+				selectionObject2 = nullptr;
+				lockedObject = nullptr;
+			}
+		
 			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
 
 			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true)) {
+			if (world->Raycast(ray, closestCollision, true, selectionObject)) {
 				selectionObject = (GameObject*)closestCollision.node;
 				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+				
+				Ray objray = selectionObject->CreateRay();
+				{
+					if (world->Raycast(objray, closestCollision, true, selectionObject)) {
+						selectionObject2 = (GameObject*)closestCollision.node;
+						Debug::DrawLine(selectionObject->Position(), selectionObject2->Position(), Vector4(1, 0, 0, 1), 60);
+						selectionObject2->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+						return true;
+					}
+					else {
+						return false;
+					}
+				}
 				return true;
 			}
 			else {
 				return false;
 			}
+
 		}
 	}
 	else {

@@ -22,6 +22,10 @@ namespace NCL {
 			Transform& SetScale(const Vector3& worldScale);
 			Transform& SetOrientation(const Quaternion& newOr);
 
+			Vector3 GetForward() const {
+				return orientation * Vector3(0, 0, -1);
+			}
+
 			Vector3 GetPosition() const {
 				return position;
 			}
