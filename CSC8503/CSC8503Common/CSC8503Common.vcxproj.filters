@@ -66,9 +66,6 @@
     <ClInclude Include="Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Constraint.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="PhysicsSystem.h">
       <Filter>Physics</Filter>
     </ClInclude>
@@ -100,6 +97,9 @@
       <Filter>CollisionDetection</Filter>
     </ClInclude>
     <ClInclude Include="CapsuleVolume.h">
+      <Filter>CollisionDetection</Filter>
+    </ClInclude>
+    <ClInclude Include="Constraint.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
   </ItemGroup>

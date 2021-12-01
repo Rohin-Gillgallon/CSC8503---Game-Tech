@@ -252,14 +252,14 @@ void TutorialGame::InitWorld() {
 }
 
 void TutorialGame::BridgeConstraintTest() {
-	Vector3 cubeSize = Vector3(8, 8, 8);
+	Vector3 cubeSize = Vector3(1, 1, 1);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
 	int numLinks = 10;
 	float maxDistance = 30; // constraint distance
 	float cubeDistance = 20; // distance between links
 
-	Vector3 startPos = Vector3(0, 10, 0);
+	Vector3 startPos = Vector3(0, 20, 0);
 
 	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0)
 		, cubeSize, 0);
