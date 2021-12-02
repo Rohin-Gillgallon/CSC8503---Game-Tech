@@ -62,6 +62,12 @@ namespace NCL {
 				physicsObject = newObject;
 			}
 
+			void SetOrientation(Quaternion rotate) {
+				Quaternion current = transform.GetOrientation();
+				current = current * rotate;
+				transform.SetOrientation(current);
+			}
+
 			const string& GetName() const {
 				return name;
 			}

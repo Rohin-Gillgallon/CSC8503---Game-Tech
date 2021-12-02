@@ -22,8 +22,8 @@ namespace NCL {
 			void InitWorld();
 
 			void InitGameExamples();
-
-			void InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius);
+			void InitAddObstacles();
+			void InitSphereGridWorld(Vector3 position, float radius, float inversemass);
 			void InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing);
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitDefaultFloor();
@@ -50,8 +50,10 @@ namespace NCL {
 
 			bool useGravity;
 			bool inSelectionMode;
+			bool rotateFloor;
 
 			float		forceMagnitude;
+			Vector3 direction;
 
 			GameObject* selectionObject = nullptr;
 			GameObject* selectionObject2 = nullptr;

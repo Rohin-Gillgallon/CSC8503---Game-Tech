@@ -5,6 +5,8 @@
 #include "../../Plugins/OpenGLRendering/OGLTexture.h"
 #include "../../Common/TextureLoader.h"
 #include "../CSC8503Common/Constraint.h"
+#include "../../Common/Quaternion.h"
+
 
 using namespace NCL;
 using namespace CSC8503;
@@ -17,6 +19,7 @@ TutorialGame::TutorialGame()	{
 	forceMagnitude	= 10.0f;
 	useGravity		= false;
 	inSelectionMode = false;
+	rotateFloor = false;
 
 	Debug::SetRenderer(renderer);
 
@@ -82,6 +85,13 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
+	if (rotateFloor) {
+		Debug::Print("(R)otate on", Vector2(5, 75));
+	}
+	else {
+		Debug::Print("(R)otate off", Vector2(5, 75));
+	}
+
 	SelectObject();
 	MoveSelectedObject();
 	physics->Update(dt);
@@ -121,6 +131,30 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
+		rotateFloor = !rotateFloor;
+	}
+
+
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W))
+		{
+			direction = Vector3(0, 0, 1);
+			std::cout << "UP\n";
+		}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S))
+		{
+			direction = Vector3(0, 0, -1);
+		}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::A))
+		{
+			direction = Vector3(-1, 0, 0);
+		}
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::D))
+		{
+			direction = Vector3(1, 0, 0);
+		}
+	
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
 		useGravity = !useGravity; //Toggle gravity!
@@ -245,10 +279,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(5, 5, 3.5f, 3.5f);
-	InitGameExamples();
+	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
+	//InitGameExamples();
+	InitSphereGridWorld(Vector3(0, 40, 0), 5.0f, 1.0f);
 	InitDefaultFloor();
-	BridgeConstraintTest();
+	InitAddObstacles();
+	//BridgeConstraintTest();
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -289,7 +325,7 @@ A single function to add a large immoveable cube to the bottom of our world
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject();
 
-	Vector3 floorSize	= Vector3(100, 2, 100);
+	Vector3 floorSize	= Vector3(50, 2, 50);
 	AABBVolume* volume	= new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
@@ -380,14 +416,23 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	return cube;
 }
 
-void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
-	for (int x = 0; x < numCols; ++x) {
+void TutorialGame::InitAddObstacles() {
+	auto obs = AddCubeToWorld(Vector3(0, 10, 0), Vector3(10, 10, 10), 0);
+	Quaternion rotate = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 1), 45);
+	obs->SetOrientation(rotate);
+
+}
+
+
+void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
+	/*for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
 			AddSphereToWorld(position, radius, 1.0f);
 		}
-	}
-	AddFloorToWorld(Vector3(0, -2, 0));
+	}*/
+	AddSphereToWorld(position, radius, inversemass);
+	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -419,6 +464,9 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -2, 0));
+	AddFloorToWorld(Vector3(100, -2, 0));
+	AddFloorToWorld(Vector3(0, -2, 100));
+	AddFloorToWorld(Vector3(100, -2, 100));
 }
 
 void TutorialGame::InitGameExamples() {
@@ -601,27 +649,37 @@ line - after the third, they'll be able to twist under torque aswell.
 */
 void TutorialGame::MoveSelectedObject() {
 	renderer->DrawString("Click Force:" + std::to_string(forceMagnitude),
-		 Vector2(10, 20)); //Draw debug text at 10,20
+		 Vector2(10, 20));//Draw debug text at 10,20
+	
 	 forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 	
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		
 		 //Push the selected object!
-		if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
-			Ray ray = CollisionDetection::BuildRayFromMouse(
-				*world->GetMainCamera());
-			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true)) {
-				/*if (closestCollision.node == selectionObject) {
-					selectionObject->GetPhysicsObject()->
-						AddForce(ray.GetDirection() * forceMagnitude);
-				}*/
-				if (closestCollision.node == selectionObject) {
-					selectionObject->GetPhysicsObject()->AddForceAtPosition(
-						ray.GetDirection() * forceMagnitude,
-						closestCollision.collidedAt);
-				}
-			}
-		}
+	 if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
+		 Ray ray = CollisionDetection::BuildRayFromMouse(
+			 *world->GetMainCamera());
+		 RayCollision closestCollision;
+		 if (world->Raycast(ray, closestCollision, true)) {
+			 /*if (closestCollision.node == selectionObject) {
+				 selectionObject->GetPhysicsObject()->
+					 AddForce(ray.GetDirection() * forceMagnitude);
+			 }*/
+
+			 if (rotateFloor) {
+				 if (closestCollision.node == selectionObject) {
+					 selectionObject->GetPhysicsObject()->AddForceAtPosition(
+						 direction * 20,
+						 closestCollision.collidedAt);
+					 std::cout << direction << std::endl;
+				 }
+			 }
+			 else if (closestCollision.node == selectionObject) {
+				 selectionObject->GetPhysicsObject()->AddForceAtPosition(
+					 ray.GetDirection() * forceMagnitude,
+					 closestCollision.collidedAt);
+			 }
+		 }
+	 }
 }
