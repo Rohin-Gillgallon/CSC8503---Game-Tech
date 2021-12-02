@@ -281,7 +281,7 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	InitSphereGridWorld(Vector3(0, 40, 0), 5.0f, 1.0f);
+	InitSphereGridWorld(Vector3(10, 40, 0), 5.0f, 1.0f);
 	InitDefaultFloor();
 	InitAddObstacles();
 	//BridgeConstraintTest();
@@ -416,11 +416,34 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	return cube;
 }
 
-void TutorialGame::InitAddObstacles() {
-	auto obs = AddCubeToWorld(Vector3(0, 10, 0), Vector3(10, 10, 10), 0);
-	Quaternion rotate = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 1), 45);
-	obs->SetOrientation(rotate);
+GameObject* TutorialGame::AddCubeToWorldOBB(const Vector3& position, Vector3 dimensions, float inverseMass) {
+	GameObject* cube = new GameObject();
 
+	OBBVolume* volume = new OBBVolume(dimensions);
+
+	cube->SetBoundingVolume((CollisionVolume*)volume);
+
+	cube->GetTransform()
+		.SetPosition(position)
+		.SetScale(dimensions * 2);
+
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
+	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
+
+	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
+	cube->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(cube);
+
+	return cube;
+}
+
+
+void TutorialGame::InitAddObstacles() {
+	auto obs = AddCubeToWorldOBB(Vector3(0, 10, 0), Vector3(10, 10, 10), 0);
+	Quaternion rotate = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 45);
+	obs->SetOrientation(rotate);
+	
 }
 
 
