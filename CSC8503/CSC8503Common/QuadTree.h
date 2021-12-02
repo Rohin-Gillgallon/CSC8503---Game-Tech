@@ -42,7 +42,7 @@ namespace NCL {
 			~QuadTreeNode() {
 				delete[] children;
 			}
-
+		public:
 			void Insert(T& object, const Vector3& objectPos, const Vector3& objectSize, int depthLeft, int maxSize) {
 				if (!CollisionDetection::AABBTest(objectPos,
 					Vector3(position.x, 0, position.y), objectSize,
@@ -74,6 +74,7 @@ namespace NCL {
 				}
 			}
 
+		protected:
 			void Split() {
 				Vector2 halfSize = size / 2.0f;
 				children = new QuadTreeNode <T >[4];
@@ -128,8 +129,7 @@ namespace NCL {
 				this->maxDepth	= maxDepth;
 				this->maxSize	= maxSize;
 			}
-			~QuadTree() {
-			}
+			~QuadTree() {}
 
 			void Insert(T object, const Vector3& pos, const Vector3& size) {
 				root.Insert(object, pos, size, maxDepth, maxSize);
