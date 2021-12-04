@@ -490,6 +490,18 @@ void TutorialGame::InitAddObstacles() {
 	auto obs15 = AddCubeToWorld(Vector3(100 / 8 * 12.5, 100 / 8 * 4, -100 / 8 * 1.5), Vector3(100 / 8, 100 / 16, 1), 0);
 
 	auto obs16 = AddCubeToWorld(Vector3(100 / 8 * 13.5, 100 / 8 * 4, -100 / 8 * 4.5), Vector3(1, 100 / 16, 100 / 16), 0);
+
+	auto obs17 = AddCubeToWorldOBB(Vector3(100 / 8 * 15.5, 100 / 8 * 2.5, -100 / 8 * 1.5), Vector3(1, 100 / 32, 100 / 8), 0);
+	Quaternion rotate17a = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 45);
+	Quaternion rotate17b = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 15);
+	Quaternion rotate17c = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 25);
+	obs17->SetOrientation(rotate17a * rotate17b * rotate17c);
+
+	auto obs18 = AddCubeToWorldOBB(Vector3(100 / 8 * 17.5, 100 / 8 * 2.5, -100 / 8 * 1.5), Vector3(1, 100 / 16, 100 / 8), 0);
+	Quaternion rotate18a = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 45);
+	Quaternion rotate18b = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -15);
+	Quaternion rotate18c = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -15);
+	obs18->SetOrientation(rotate18a * rotate18b * rotate18c);
 }
 
 void TutorialGame::Stairs() {
@@ -538,10 +550,11 @@ void TutorialGame::Stairs() {
 }
 
 void TutorialGame::JumpPad1(){
-	auto Walla1 = AddCubeToWorld(Vector3(100 / 8 * 16, 100 / 8, 0), Vector3(1, 100 / 16, 100 / 12), 0);
-	auto Walla2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8, 0), Vector3(1, 100 / 16, 100 / 12), 0);
-	auto Walla3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, 100 / 12 + 1), Vector3(100 / 12, 100 / 16, 1), 0);
+	auto Walla1 = AddCubeToWorld(Vector3(100 / 8 * 16, 100 / 8 + 100 / 24, 0), Vector3(1, 100 / 16, 100 / 12), 0);
+	auto Walla2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8 + 100 / 24, 0), Vector3(1, 100 / 16, 100 / 12), 0);
+	auto Walla3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 100 / 24, 100 / 12 + 1), Vector3(100 / 12, 100 / 16, 1), 0);
 	auto Walla4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1), Vector3(100 / 12, 100 / 16, 1), 0);
+	auto floora = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 12 + 1, 1), Vector3(100 / 12, 1, 100 / 12), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
