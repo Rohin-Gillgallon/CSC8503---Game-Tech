@@ -6,6 +6,7 @@
 #include "../../Common/TextureLoader.h"
 #include "../CSC8503Common/Constraint.h"
 #include "../../Common/Quaternion.h"
+#include "../../Common/Vector3.h"
 
 
 using namespace NCL;
@@ -140,7 +141,6 @@ void TutorialGame::UpdateKeys() {
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W))
 		{
 			direction = Vector3(0, 0, 1);
-			std::cout << "UP\n";
 		}
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S))
 		{
@@ -284,6 +284,7 @@ void TutorialGame::InitWorld() {
 	InitSphereGridWorld(Vector3(-40, 10, -40), 5.0f, 2.0f);
 	InitDefaultFloor();
 	InitAddObstacles();
+	Stairs();
 	//BridgeConstraintTest();
 }
 
@@ -440,6 +441,9 @@ GameObject* TutorialGame::AddCubeToWorldOBB(const Vector3& position, Vector3 dim
 
 
 void TutorialGame::InitAddObstacles() {
+
+	auto obs = AddCubeToWorld(Vector3(-100 / 8 * 4, 100 / 8, -100 / 8 + 100/ 16 ), Vector3(1, 100 / 8, 100 / 8 * 3.5), 0);
+
 	auto obs1 = AddCubeToWorldOBB(Vector3(-100 / 8 * 3, 100 / 8, 100 / 8 * 2.5 + 100 / 16), Vector3(1, 100 / 8, 100 / 8), 0);
 	Quaternion rotate1 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 45);
 	obs1->SetOrientation(rotate1);
@@ -457,9 +461,64 @@ void TutorialGame::InitAddObstacles() {
 	obs5->SetOrientation(rotate5);
 
 	auto obs6 = AddCubeToWorld(Vector3(100 / 8, 100 / 8, -100 / 8 * 4), Vector3(100 / 8, 100 / 8, 1), 0);
+
+	auto obs7 = AddCubeToWorldOBB(Vector3(100 / 8 * 1.5, 1, -100 / 8 * 3), Vector3(100 / 8 * 0.9, 1, 100 / 8 * 0.9), 0);
+	Quaternion rotate7 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 15);
+	obs7->SetOrientation(rotate7);
+
+	auto obs8 = AddCubeToWorld(Vector3(100 / 8 *2, 100 / 8 *1.25, -100 / 8 * 1.5), Vector3(100 / 8 * 1.5, 100 / 8 * 1.25, 1), 0);
+
+	auto obs9 = AddCubeToWorldOBB(Vector3(100 / 8 * 14.5, 100 / 8 * 3, -100 / 8 * 3), Vector3(100 / 8, 2, 100 / 8), 0);
+	Quaternion rotate9 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -30);
+	obs9->SetOrientation(rotate9);
 }
 
-  
+void TutorialGame::Stairs() {
+	stair1 = AddCubeToWorldOBB(Vector3(100 / 8 * 3.25, 2.75, -100 / 8 * 3), Vector3(100 / 8, 1, 100 / 8), 0);
+	Quaternion rotate1a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate1b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -5);
+	stair1->SetOrientation(rotate1a * rotate1b);
+
+	stair2 = AddCubeToWorldOBB(Vector3(100 / 8 * 4.25, 1.5, -100 / 8 * 5), Vector3(100 / 8 * 2, 1, 100 / 8), 0);
+	Quaternion rotate2a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate2b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 5);
+	stair2->SetOrientation(rotate2a * rotate2b);
+
+	stair3 = AddCubeToWorldOBB(Vector3(100 / 8 * 5.25, 2.75, -100 / 8 * 3), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate3a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate3b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -5);
+	stair3->SetOrientation(rotate3a * rotate3b);
+
+	stair4 = AddCubeToWorldOBB(Vector3(100 / 8 * 6.25, 1.5, -100 / 8 * 5), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate4a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate4b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 5);
+	stair4->SetOrientation(rotate4a * rotate4b);
+
+	stair5 = AddCubeToWorldOBB(Vector3(100 / 8 * 7.25, 7.75, -100 / 8 * 3), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate5a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate5b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -5);
+	stair5->SetOrientation(rotate5a * rotate5b);
+
+	stair6 = AddCubeToWorldOBB(Vector3(100 / 8 * 8.25, 6.5, -100 / 8 * 5), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate6a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate6b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 5);
+	stair6->SetOrientation(rotate6a * rotate6b);
+
+	stair7 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.25, 12.75, -100 / 8 * 3), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate7a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate7b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -5);
+	stair7->SetOrientation(rotate7a * rotate7b);
+
+	stair8 = AddCubeToWorldOBB(Vector3(100 / 8 * 10.25, 11.5, -100 / 8 * 5), Vector3(100 / 8, 100 / 16, 100 / 8), 0);
+	Quaternion rotate8a = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -5);
+	Quaternion rotate8b = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 5);
+	stair8->SetOrientation(rotate8a * rotate8b);
+
+	stair9 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 3), Vector3(100 / 8 * 1.5, 100 / 8 * 2, 100 / 8), 0);
+	stair10 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 4.5), Vector3(100 / 8, 100 / 8 * 2, 100 / 16), 0);
+}
+
+
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	/*for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -503,6 +562,11 @@ void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(100, -2, 0));
 	AddFloorToWorld(Vector3(0, -2, 100));
 	AddFloorToWorld(Vector3(100, -2, 100));
+	AddFloorToWorld(Vector3(200, -2, 0));
+	AddFloorToWorld(Vector3(0, -2, 200));
+	AddFloorToWorld(Vector3(100, -2, 200));
+	AddFloorToWorld(Vector3(200, -2, 100));
+	AddFloorToWorld(Vector3(200, -2, 200));
 }
 
 void TutorialGame::InitGameExamples() {
@@ -689,6 +753,22 @@ void TutorialGame::MoveSelectedObject() {
 	
 	 forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 	
+	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
+	 {
+		 stair2->Move(stairlift);
+		 stair4->Move(stairlift);
+		 stair6->Move(stairlift);
+		 stair8->Move(stairlift);
+	 }
+
+	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN))
+	 {
+		 stair2->Move(-stairlift);
+		 stair4->Move(-stairlift);
+		 stair6->Move(-stairlift);
+		 stair8->Move(-stairlift);
+	 }
+
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		

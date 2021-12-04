@@ -42,6 +42,10 @@ namespace NCL {
 				return transform.GetPosition();
 			}
 
+			void Move(Vector3 movement) {
+				transform.SetPosition(transform.GetPosition() + movement);
+			}
+
 			Transform& GetTransform() {
 				return transform;
 			}

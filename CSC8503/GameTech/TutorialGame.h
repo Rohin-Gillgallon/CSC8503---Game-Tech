@@ -49,16 +49,29 @@ namespace NCL {
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
+			void Stairs();
+
 			bool useGravity;
 			bool inSelectionMode;
 			bool rotateFloor;
 
+			Vector3 stairlift = Vector3(0, 0.1, 0);
 			float		forceMagnitude;
 			Vector3 direction;
 
 			GameObject* selectionObject = nullptr;
 			GameObject* selectionObject2 = nullptr;
 			GameObject* Ball = nullptr;
+			GameObject* stair1;
+			GameObject* stair2;
+			GameObject* stair3;
+			GameObject* stair4;
+			GameObject* stair5;
+			GameObject* stair6;
+			GameObject* stair7;
+			GameObject* stair8;
+			GameObject* stair9;
+			GameObject* stair10;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
