@@ -285,6 +285,7 @@ void TutorialGame::InitWorld() {
 	InitDefaultFloor();
 	InitAddObstacles();
 	Stairs();
+	JumpPad1();
 	//BridgeConstraintTest();
 }
 
@@ -476,7 +477,7 @@ void TutorialGame::InitAddObstacles() {
 	Quaternion rotate10 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 30);
 	obs10->SetOrientation(rotate10);
 
-	auto obs11 = AddCubeToWorldOBB(Vector3(100 / 8 * 16.5, 100 / 8 * 2, -100 / 8 * 3), Vector3(100 / 8, 2, 100 / 8), 0);
+	auto obs11 = AddCubeToWorldOBB(Vector3(100 / 8 * 16.5, 100 / 8 * 2, -100 / 8 * 2.5), Vector3(100 / 8, 2, 100 / 6), 0);
 	Quaternion rotate11 = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 15);
 	obs11->SetOrientation(rotate11);
 
@@ -536,8 +537,11 @@ void TutorialGame::Stairs() {
 	stair10 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 4.5), Vector3(100 / 8, 100 / 8 * 2, 100 / 16), 0);
 }
 
-void TutorialGame::JumpPad1() {
-
+void TutorialGame::JumpPad1(){
+	auto Walla1 = AddCubeToWorld(Vector3(100 / 8 * 16, 100 / 8, 0), Vector3(1, 100 / 16, 100 / 12), 0);
+	auto Walla2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8, 0), Vector3(1, 100 / 16, 100 / 12), 0);
+	auto Walla3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, 100 / 12 + 1), Vector3(100 / 12, 100 / 16, 1), 0);
+	auto Walla4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1), Vector3(100 / 12, 100 / 16, 1), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
@@ -545,7 +549,7 @@ void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inv
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
 			AddSphereToWorld(position, radius, 1.0f);
-		}
+		}w
 	}*/
 	Ball = AddSphereToWorld(position, radius, inversemass);
 	//AddFloorToWorld(Vector3(0, -2, 0));
