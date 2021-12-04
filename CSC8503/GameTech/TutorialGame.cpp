@@ -281,7 +281,7 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	InitSphereGridWorld(Vector3(10, 40, 0), 5.0f, 1.0f);
+	InitSphereGridWorld(Vector3(-40, 10, -40), 5.0f, 2.0f);
 	InitDefaultFloor();
 	InitAddObstacles();
 	//BridgeConstraintTest();
@@ -440,13 +440,26 @@ GameObject* TutorialGame::AddCubeToWorldOBB(const Vector3& position, Vector3 dim
 
 
 void TutorialGame::InitAddObstacles() {
-	auto obs = AddCubeToWorldOBB(Vector3(0, 10, 0), Vector3(10, 10, 10), 0);
-	Quaternion rotate = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 45);
-	obs->SetOrientation(rotate);
+	auto obs1 = AddCubeToWorldOBB(Vector3(-100 / 8 * 3, 100 / 8, 100 / 8 * 2.5 + 100 / 16), Vector3(1, 100 / 8, 100 / 8), 0);
+	Quaternion rotate1 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 45);
+	obs1->SetOrientation(rotate1);
 	
+	auto obs2 = AddCubeToWorldOBB(Vector3(-100 / 8, 100 / 8, 100 / 8 * 2.5 + 100 / 16), Vector3(1, 100 / 8, 100 / 8), 0);
+	Quaternion rotate2 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -45);
+	obs2->SetOrientation(rotate2);
+
+	auto obs3 = AddCubeToWorld(Vector3(-100 / 8 * 2, 100 / 8, -100 / 8 - 100 / 16), Vector3(1, 100 / 8, 100 / 8 * 2.5), 0);
+
+	auto obs4 = AddCubeToWorld(Vector3(0, 100 / 8, 0), Vector3(1, 100 / 8, 100 / 8 * 2), 0);
+
+	auto obs5 = AddCubeToWorldOBB(Vector3(-100 / 8, 100 / 8, -100 / 8 * 3.5), Vector3(1, 100 / 8, 100 / 8), 0);
+	Quaternion rotate5 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -45);
+	obs5->SetOrientation(rotate5);
+
+	auto obs6 = AddCubeToWorld(Vector3(100 / 8, 100 / 8, -100 / 8 * 4), Vector3(100 / 8, 100 / 8, 1), 0);
 }
 
-
+  
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	/*for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
@@ -454,7 +467,7 @@ void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inv
 			AddSphereToWorld(position, radius, 1.0f);
 		}
 	}*/
-	AddSphereToWorld(position, radius, inversemass);
+	Ball = AddSphereToWorld(position, radius, inversemass);
 	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 

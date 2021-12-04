@@ -58,6 +58,7 @@ namespace NCL {
 
 			GameObject* selectionObject = nullptr;
 			GameObject* selectionObject2 = nullptr;
+			GameObject* Ball = nullptr;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
