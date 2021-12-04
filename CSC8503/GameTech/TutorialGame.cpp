@@ -471,6 +471,24 @@ void TutorialGame::InitAddObstacles() {
 	auto obs9 = AddCubeToWorldOBB(Vector3(100 / 8 * 14.5, 100 / 8 * 3, -100 / 8 * 3), Vector3(100 / 8, 2, 100 / 8), 0);
 	Quaternion rotate9 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -30);
 	obs9->SetOrientation(rotate9);
+
+	auto obs10 = AddCubeToWorldOBB(Vector3(100 / 8 * 18.5, 100 / 8 * 3, -100 / 8 * 3), Vector3(100 / 8, 2, 100 / 8), 0);
+	Quaternion rotate10 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 30);
+	obs10->SetOrientation(rotate10);
+
+	auto obs11 = AddCubeToWorldOBB(Vector3(100 / 8 * 16.5, 100 / 8 * 2, -100 / 8 * 3), Vector3(100 / 8, 2, 100 / 8), 0);
+	Quaternion rotate11 = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 15);
+	obs11->SetOrientation(rotate11);
+
+	auto obs12 = AddCubeToWorld(Vector3(100 / 8 * 11.5, 100 / 8 * 1.5, -100 / 8 * 5.5), Vector3(1, 100 / 16, 100 / 16), 0);
+
+	auto obs13 = AddCubeToWorld(Vector3(100 / 8 * 11, 100 / 8 * 1.5, -100 / 8 * 6.25), Vector3(100 / 16, 100 / 16, 1), 0);
+
+	auto obs14 = AddCubeToWorld(Vector3(100 / 8 * 12.5, 100 / 8 * 4, -100 / 8 * 5.5), Vector3(100 / 8, 100 / 16, 1), 0);
+
+	auto obs15 = AddCubeToWorld(Vector3(100 / 8 * 12.5, 100 / 8 * 4, -100 / 8 * 1.5), Vector3(100 / 8, 100 / 16, 1), 0);
+
+	auto obs16 = AddCubeToWorld(Vector3(100 / 8 * 13.5, 100 / 8 * 4, -100 / 8 * 4.5), Vector3(1, 100 / 16, 100 / 16), 0);
 }
 
 void TutorialGame::Stairs() {
@@ -518,6 +536,9 @@ void TutorialGame::Stairs() {
 	stair10 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 4.5), Vector3(100 / 8, 100 / 8 * 2, 100 / 16), 0);
 }
 
+void TutorialGame::JumpPad1() {
+
+}
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	/*for (int x = 0; x < numCols; ++x) {

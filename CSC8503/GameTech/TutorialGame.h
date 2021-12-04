@@ -50,6 +50,7 @@ namespace NCL {
 			GameWorld*			world;
 
 			void Stairs();
+			void JumpPad1();
 
 			bool useGravity;
 			bool inSelectionMode;
