@@ -51,15 +51,19 @@ namespace NCL {
 
 			void Stairs();
 			void JumpPad1();
-			Vector3 SpawnPoint;
+			void JumpPad2();
+			void JumpPad3();
+
+			Vector3 SpawnPoint = Vector3(-40, 10, -40);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
 
 			bool useGravity;
 			bool inSelectionMode;
 			bool rotateFloor;
+			bool jumppadcollsion1 = false;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
-			float		forceMagnitude;
+			float forceMagnitude;
 			Vector3 direction;
 
 			GameObject* selectionObject = nullptr;
@@ -75,6 +79,9 @@ namespace NCL {
 			GameObject* stair8;
 			GameObject* stair9;
 			GameObject* stair10;
+			GameObject* floora;
+			GameObject* floorb;
+			GameObject* floorc;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
