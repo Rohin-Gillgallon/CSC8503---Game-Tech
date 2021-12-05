@@ -21,7 +21,7 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-
+	SpawnPoint = Vector3(-40, 10, -40);
 	Debug::SetRenderer(renderer);
 
 	InitialiseAssets();
@@ -86,13 +86,6 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
-	if (rotateFloor) {
-		Debug::Print("(R)otate on", Vector2(5, 75));
-	}
-	else {
-		Debug::Print("(R)otate off", Vector2(5, 75));
-	}
-
 	SelectObject();
 	MoveSelectedObject();
 	physics->Update(dt);
@@ -134,7 +127,9 @@ void TutorialGame::UpdateKeys() {
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
-		rotateFloor = !rotateFloor;
+		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		Ball->Respawn(SpawnPoint);
 	}
 
 
@@ -281,7 +276,7 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	InitSphereGridWorld(Vector3(-40, 10, -40), 5.0f, 2.0f);
+	InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
 	InitDefaultFloor();
 	InitAddObstacles();
 	Stairs();
@@ -341,7 +336,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->GetPhysicsObject()->InitCubeInertia();
 
 	world->AddGameObject(floor);
-
+	floor->SetName("floor");
 	return floor;
 }
 
@@ -546,6 +541,7 @@ void TutorialGame::Stairs() {
 	stair8->SetOrientation(rotate8a * rotate8b);
 
 	stair9 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 3), Vector3(100 / 8 * 1.5, 100 / 8 * 2, 100 / 8), 0);
+	stair9->SetName("Checkpoint1");
 	stair10 = AddCubeToWorld(Vector3(100 / 8 * 12.25, 100 / 8 * 2, -100 / 8 * 4.5), Vector3(100 / 8, 100 / 8 * 2, 100 / 16), 0);
 }
 
@@ -555,6 +551,7 @@ void TutorialGame::JumpPad1(){
 	auto Walla3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 100 / 24, 100 / 12 + 1), Vector3(100 / 12, 100 / 16, 1), 0);
 	auto Walla4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1), Vector3(100 / 12, 100 / 16, 1), 0);
 	auto floora = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 12 + 1, 1), Vector3(100 / 12, 1, 100 / 12), 0);
+	floora->SetName("JumpPadA");
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
@@ -565,6 +562,7 @@ void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inv
 		}w
 	}*/
 	Ball = AddSphereToWorld(position, radius, inversemass);
+	Ball->SetName("Player");
 	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
@@ -807,6 +805,13 @@ void TutorialGame::MoveSelectedObject() {
 		 stair8->Move(-stairlift);
 	 }
 
+	 CollisionDetection::CollisionInfo info;
+	 if (CollisionDetection::ObjectIntersection(Ball, stair9, info))
+	 {
+		 SpawnPoint = Checkpoint1;
+		 std::cout << "Checkpoint Reached\n";
+	 }
+
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		
@@ -821,18 +826,11 @@ void TutorialGame::MoveSelectedObject() {
 					 AddForce(ray.GetDirection() * forceMagnitude);
 			 }*/
 
-			 if (rotateFloor) {
-				 if (closestCollision.node == selectionObject) {
-					 selectionObject->GetPhysicsObject()->AddForceAtPosition(
-						 direction * 20,
-						 closestCollision.collidedAt);
-					 std::cout << direction << std::endl;
-				 }
-			 }
-			 else if (closestCollision.node == selectionObject) {
+			 if (closestCollision.node == selectionObject) {
 				 selectionObject->GetPhysicsObject()->AddForceAtPosition(
 					 ray.GetDirection() * forceMagnitude,
 					 closestCollision.collidedAt);
+				 std::cout << ray.GetDirection() << std::endl;
 			 }
 		 }
 	 }

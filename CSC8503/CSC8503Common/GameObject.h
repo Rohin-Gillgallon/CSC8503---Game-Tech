@@ -42,6 +42,10 @@ namespace NCL {
 				return transform.GetPosition();
 			}
 
+			void Respawn(Vector3 spawnPoint) {
+				transform.SetPosition(spawnPoint);
+			}
+
 			void Move(Vector3 movement) {
 				transform.SetPosition(transform.GetPosition() + movement);
 			}
@@ -74,6 +78,10 @@ namespace NCL {
 
 			const string& GetName() const {
 				return name;
+			}
+
+			void SetName(std::string n) {
+				name = n;
 			}
 
 			virtual void OnCollisionBegin(GameObject* otherObject) {

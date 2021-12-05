@@ -51,6 +51,8 @@ namespace NCL {
 
 			void Stairs();
 			void JumpPad1();
+			Vector3 SpawnPoint;
+			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
 
 			bool useGravity;
 			bool inSelectionMode;
