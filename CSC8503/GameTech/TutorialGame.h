@@ -60,7 +60,11 @@ namespace NCL {
 			bool useGravity;
 			bool inSelectionMode;
 			bool rotateFloor;
-			bool jumppadcollsion1 = false;
+			bool jumppad1 = false;
+			bool jumppad2 = false;
+			bool jumppadcollision1 = true;
+			bool jumppadcollision2 = true;
+			bool Teleport1 = false;;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			float forceMagnitude;
@@ -81,6 +85,7 @@ namespace NCL {
 			GameObject* stair10;
 			GameObject* floora;
 			GameObject* floorb;
+			GameObject* Wallb4;
 			GameObject* floorc;
 
 			OGLMesh*	capsuleMesh = nullptr;

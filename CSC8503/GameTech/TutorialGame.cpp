@@ -23,7 +23,7 @@ TutorialGame::TutorialGame()	{
 	rotateFloor = false;
 	SpawnPoint = Checkpoint1;
 	Debug::SetRenderer(renderer);
-
+	
 	InitialiseAssets();
 }
 
@@ -130,15 +130,24 @@ void TutorialGame::UpdateKeys() {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		Ball->Respawn(SpawnPoint);
+		//Ball->Respawn(Vector3(100 / 8 * 15.5 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
 	}
 
+	if (Teleport1) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
+			useGravity = false;
+			Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+			useGravity = true;
+			Teleport1 = false;
+		}
+	}
 
 		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W))
 		{
 			direction = Vector3(0, 0, 1);
 		}
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S))
-		{
+		{r
 			direction = Vector3(0, 0, -1);
 		}
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::A))
@@ -282,7 +291,6 @@ void TutorialGame::InitWorld() {
 	Stairs();
 	JumpPad1();
 	JumpPad2();
-	JumpPad3();
 	//BridgeConstraintTest();
 }
 
@@ -552,27 +560,20 @@ void TutorialGame::JumpPad1(){
 	auto Walla2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8 + 100 / 24, 0), Vector3(1, 100 / 16, 100 / 12), 0);
 	//auto Walla3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1), Vector3(100 / 12, 100 / 16, 1), 0);
 	//auto Walla4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 100 / 24, 100 / 12 + 1), Vector3(100 / 12, 100 / 16, 1), 0);
-	floora = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 12 + 1, 1), Vector3(100 / 12, 1, 100 / 12), 0);
+	floora = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 + 1, 1), Vector3(100 / 12, 1, 100 / 12), 0);
 	floora->SetName("JumpPadA");
 }
 
 void TutorialGame::JumpPad2() {
-	auto Wallb1 = AddCubeToWorld(Vector3(100 / 8 * 15.5 - 2, 100 / 8 + 100 / 24-4, 100 / 8 * 5), Vector3(1, 100 / 16, 100 / 12), 0);
+	//auto Wallb1 = AddCubeToWorld(Vector3(100 / 8 * 16 - 2, 100 / 8 + 100 / 32, 100 / 8 * 5), Vector3(1, 100 / 16, 100 / 12), 0);
 	//auto Wallb2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8 + 100 / 24 - 4, 100 / 8 * 5), Vector3(1, 100 / 16, 100 / 12), 0);
 	//auto Wallb3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1 + 100/8*5), Vector3(100 / 12, 100 / 16, 1), 0);
-	auto Wallb4 = AddCubeToWorld(Vector3(100 / 8 * 15.5 + 100 / 12, 100 / 8 + 100 / 24 - 4, 100 / 12 + 1 + 100 / 8 * 4.75), Vector3(100 / 12, 100 / 16, 1), 0);
-	floorb = AddCubeToWorld(Vector3(100 / 8 * 15.5 + 100 / 12 - 1, 100 / 12 - 4, 100 / 8 * 4.75 + 1), Vector3(100 / 12, 1, 100 / 12), 0);
+	Wallb4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 100 / 32, 100 / 12 + 1 + 100 / 8 * 5), Vector3(100 / 8, 100 / 8, 1), 0);
+	Wallb4->SetName("Wallb4");
+	floorb = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 - 4, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 12), 0);
 	floorb->SetName("JumpPadB");
 }
 
-void TutorialGame::JumpPad3() {
-	//auto Wallc1 = AddCubeToWorld(Vector3(100 / 8 * 16 - 2, 100 / 8 + 100 / 24 - 4, 100 / 8 * 5), Vector3(1, 100 / 16, 100 / 12), 0);
-	//auto Wallc2 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 6, 100 / 8 + 100 / 24 - 4, 100 / 8 * 5), Vector3(1, 100 / 16, 100 / 12), 0);
-	//auto Wallc3 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8, -100 / 12 - 1 + 100/8*5), Vector3(100 / 12, 100 / 16, 1), 0);
-	//auto Wallc4 = AddCubeToWorld(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 100 / 24 - 4, 100 / 12 + 1 + 100 / 8 * 4.75), Vector3(100 / 12, 100 / 16, 1), 0);
-	floorc = AddCubeToWorld(Vector3(100 / 8 * 18 + 100 / 12 - 1, 100 / 12 - 6, 100 / 8 + 1), Vector3(100 / 12, 1, 100 / 12), 0);
-	floorc->SetName("JumpPadC");
-}
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	/*for (int x = 0; x < numCols; ++x) {
@@ -825,35 +826,49 @@ void TutorialGame::MoveSelectedObject() {
 		 stair8->Move(-stairlift);
 	 }
 
-	 CollisionDetection::CollisionInfo info;
-	 if (CollisionDetection::ObjectIntersection(Ball, stair9, info))
+	 CollisionDetection::CollisionInfo info1;
+	 if (CollisionDetection::ObjectIntersection(Ball, stair9, info1))
 	 {
 		 SpawnPoint = Checkpoint1;
 		 std::cout << "Checkpoint Reached\n";
 	 }
-
-	 if (CollisionDetection::ObjectIntersection(Ball, floora, info)) {
-		 if (!jumppadcollsion1)
-		 {
-			 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-			 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-			 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 5000, Vector3(200.149, 12.2566, -2.58092));
+	 CollisionDetection::CollisionInfo info2;
+	 if (CollisionDetection::ObjectIntersection(Ball, floora, info2)) {
+		 
+		 useGravity = false;
+		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
+		 useGravity = true;
+		 jumppadcollision1 = false;
+		 jumppad1 = true;
+		 if (jumppad1) {
+			 if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::J)) {
+				 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3000, Vector3(200.149, 12.2566, -2.58092));
+			 }
+			 std::cout << "Jump1" << std::endl;
+			 //jumppad1 = false;
 		 }
 	 }
 
-	 if (CollisionDetection::ObjectIntersection(Ball, floorb, info)) {
+	 CollisionDetection::CollisionInfo info3;
+	 if (CollisionDetection::ObjectIntersection(Ball, Wallb4, info3)) {
+		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(0.575723, -0.31737, -0.753537) * 3500, Vector3(194.483, 7.06002, 56.3982));
+		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
+		 useGravity = true;
 	 }
 
-	 if (CollisionDetection::ObjectIntersection(Ball, floorc, info)) {
+	 CollisionDetection::CollisionInfo info4;
+	 if (CollisionDetection::ObjectIntersection(Ball, floorb, info4)) {
+		 
+		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
-			 useGravity = false;
-			 Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
-		 }
+		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
+		 Teleport1 = true;
+		
 	 }
 
 	 if (!selectionObject) {
