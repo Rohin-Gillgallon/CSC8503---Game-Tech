@@ -54,6 +54,10 @@ namespace NCL {
 				return transform;
 			}
 
+			void SetTransform(Transform T) {
+				transform = T;
+			}
+
 			RenderObject* GetRenderObject() const {
 				return renderObject;
 			}

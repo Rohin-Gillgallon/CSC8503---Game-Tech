@@ -17,7 +17,7 @@ TutorialGame::TutorialGame()	{
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
 
-	forceMagnitude	= 10.0f;
+	forceMagnitude	= 500.0f;
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
@@ -129,8 +129,8 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		Ball->Respawn(SpawnPoint);
-		//Ball->Respawn(Vector3(100 / 8 * 15.5 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
+		//Ball->Respawn(SpawnPoint);
+		Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
 	}
 
 	if (Teleport1) {
@@ -291,6 +291,8 @@ void TutorialGame::InitWorld() {
 	Stairs();
 	JumpPad1();
 	JumpPad2();
+	WobblingPlatforms();
+	RotatingPlatform();
 	//BridgeConstraintTest();
 }
 
@@ -507,6 +509,10 @@ void TutorialGame::InitAddObstacles() {
 	Quaternion rotate18b = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), -15);
 	Quaternion rotate18c = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -15);
 	obs18->SetOrientation(rotate18a * rotate18b * rotate18c);
+
+	auto obs19 = AddCubeToWorld(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
+	auto obs20 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
+	auto obs21 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
 }
 
 void TutorialGame::Stairs() {
@@ -574,13 +580,25 @@ void TutorialGame::JumpPad2() {
 	floorb->SetName("JumpPadB");
 }
 
+void TutorialGame::WobblingPlatforms() {
+	auto plat1 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+	auto plat2 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 45, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+	auto plat3 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 90, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+}
+
+void TutorialGame::RotatingPlatform() {
+	rotatingplat = AddCubeToWorldOBB(Vector3(-3, 100 / 8 + 55, 100 / 8 * 7.75 + 1), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
+	Quaternion rotatePLAT = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 79);
+	rotatingplat->SetOrientation(rotatePLAT);
+	rotatingplat->SetName("Spinner");
+}
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	/*for (int x = 0; x < numCols; ++x) {
 		for (int z = 0; z < numRows; ++z) {
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
 			AddSphereToWorld(position, radius, 1.0f);
-		}w
+		}
 	}*/ 
 	Ball = AddSphereToWorld(position, radius, inversemass);
 	Ball->SetName("Player");
@@ -862,8 +880,20 @@ void TutorialGame::MoveSelectedObject() {
 		 Teleport1 = true;
 	 }
 
+	 CollisionDetection::CollisionInfo info5;
+	 if (CollisionDetection::ObjectIntersection(Ball, rotatingplat, info5)) {
+		 useGravity = false;
+		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Matrix3 transform = Matrix3(rotatingplat->GetTransform().GetOrientation());
+		 Matrix3 invTransform = Matrix3(rotatingplat->GetTransform().GetOrientation().Conjugate());
+		 auto sum = transform * rotatingplat->Position();
+		 auto adjust = transform * Vector3(0, -20, 20);
+		 Ball->Respawn((rotatingplat->Position() - adjust));
+	 }
+
 	 if (!selectionObject) {
-		 return;//we haven’t selected anything!
+		 return;//we haven’t selected anything!qwqqsqdqdqd
 	 }		
 		 //Push the selected object!
 	 if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
