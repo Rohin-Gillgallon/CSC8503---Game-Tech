@@ -840,15 +840,7 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 		 useGravity = true;
-		 jumppadcollision1 = false;
-		 jumppad1 = true;
-		 if (jumppad1) {
-			 if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::J)) {
-				 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3000, Vector3(200.149, 12.2566, -2.58092));
-			 }
-			 std::cout << "Jump1" << std::endl;
-			 //jumppad1 = false;
-		 }
+		 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 4000, Vector3(200.149, 12.2566, -2.58092));
 	 }
 
 	 CollisionDetection::CollisionInfo info3;
@@ -868,7 +860,6 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
 		 Teleport1 = true;
-		
 	 }
 
 	 if (!selectionObject) {
