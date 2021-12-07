@@ -612,7 +612,7 @@ void TutorialGame::RotatingPlatform(float angle) {
 void TutorialGame::WobblingPlatform() {
 	Wplat = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 25, 100 / 8 * 10.75 + 1), Vector3(100 / 8 * 3, 1, 100 / 8 * 3), 0);
 	Wplat->SetName("WobblingPlatform");
-	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 45);
+	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 1);
 	Wplat->SetOrientation(rotateWPLAT);
 	auto temp = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(4, 4, 4), 1);
 }
