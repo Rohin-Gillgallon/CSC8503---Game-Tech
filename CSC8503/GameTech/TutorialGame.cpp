@@ -295,6 +295,10 @@ void TutorialGame::InitWorld() {
 	AddRotatingBridges();
 	AddRotatingPlatform();
 	WobblingPlatform();
+	AddTravelPlatform();
+	AddMazePlatform();
+	AddProjectilePlatform();
+	AddGravityWell();
 	//BridgeConstraintTest();
 }
 
@@ -612,9 +616,42 @@ void TutorialGame::RotatingPlatform(float angle) {
 void TutorialGame::WobblingPlatform() {
 	Wplat = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 25, 100 / 8 * 10.75 + 1), Vector3(100 / 8 * 3, 1, 100 / 8 * 3), 0);
 	Wplat->SetName("WobblingPlatform");
-	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 1);
+	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 0);
 	Wplat->SetOrientation(rotateWPLAT);
 	auto temp = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(4, 4, 4), 1);
+}
+
+void TutorialGame::AddTravelPlatform() {
+	liftPlat = AddCubeToWorldOBB(Vector3(50, 100 / 8 + 50, 100 / 8 * 15), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
+	liftPlat->SetName("Spinner"); //Vector3(0, -14, -100/8 * 3.5); // Vector3(0, -25, -100/8 * 3);
+	liftPlat2 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -14, -100 / 8 * 3.5)), Vector3(100 / 16, 10, 2), 0);
+	liftPlat2->SetName("LiftSupport");
+	liftPlat3 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -25, -100 / 8 * 3)), Vector3(100 / 16, 1, 100 / 12), 0);
+	liftPlat3->SetName("Lift");
+	Quaternion rotatelifta = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -90);
+	Quaternion rotateliftb = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -30);
+	liftPlat->SetOrientation(rotatelifta * rotateliftb);
+	liftPlat2->SetOrientation(rotatelifta * rotateliftb);
+	liftPlat3->SetOrientation(rotatelifta * rotateliftb);
+	Matrix3 transform = Matrix3(liftPlat->GetTransform().GetOrientation());
+	auto adjust2 = transform * Vector3(0, -14, -100 / 8 * 3.5);
+	auto adjust3 = transform * Vector3(0, -25, -100 / 8 * 3);
+	liftPlat2->Respawn((liftPlat->Position() + adjust2));
+	liftPlat3->Respawn((liftPlat->Position() + adjust3));
+}
+
+void TutorialGame::AddMazePlatform() {
+	auto mazeplat = AddCubeToWorldOBB(Vector3(0, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+}
+
+void TutorialGame::AddProjectilePlatform() {
+	auto Projplat = AddCubeToWorldOBB(Vector3(75, 100 / 8 + 65, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
+	Projplat->SetOrientation(rotateproj);
+}
+
+void TutorialGame::AddGravityWell() {
+	auto GravWell = AddCubeToWorldOBB(Vector3(150, 100 / 8 + 80, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {

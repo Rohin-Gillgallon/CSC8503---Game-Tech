@@ -57,6 +57,10 @@ namespace NCL {
 			void AddRotatingPlatform();
 			void RotatingPlatform(float angle);
 			void WobblingPlatform();
+			void AddTravelPlatform();
+			void AddMazePlatform();
+			void AddProjectilePlatform();
+			void AddGravityWell();
 
 			Vector3 SpawnPoint = Vector3(-40, 10, -40);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
@@ -94,6 +98,9 @@ namespace NCL {
 			GameObject* rotatingplat2;
 			GameObject* rotatingplat3;
 			GameObject* Wplat;
+			GameObject* liftPlat;
+			GameObject* liftPlat2;
+			GameObject* liftPlat3;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
