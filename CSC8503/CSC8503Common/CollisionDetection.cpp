@@ -481,7 +481,62 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 bool CollisionDetection::OBBIntersection(
 	const OBBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
+
+	Quaternion orientationA = worldTransformA.GetOrientation();
+	Matrix3 transformA = Matrix3(orientationA);
+	Matrix3 invTransformA = Matrix3(orientationA.Conjugate());
+	
+	Quaternion orientationB = worldTransformB.GetOrientation();
+	Matrix3 transformB = Matrix3(orientationB);
+	Matrix3 invTransformB = Matrix3(orientationA.Conjugate());
+
+	Vector3 boxAPos = worldTransformA.GetPosition();
+	Vector3 boxBPos = worldTransformB.GetPosition();
+
+	Vector3 boxASize = volumeA.GetHalfDimensions();
+	Vector3 boxBSize = volumeB.GetHalfDimensions();
+
+	bool overlap = AABBTest(invTransformA * boxAPos, invTransformB * boxBPos, boxASize, boxBSize);
+
+	if (overlap) {
+		static const Vector3 faces[6] =
+		{
+			Vector3(-1, 0, 0), Vector3(1, 0, 0),
+			Vector3(0, -1, 0), Vector3(0, 1, 0),
+			Vector3(0, 0, -1), Vector3(0, 0, 1),
+		};
+
+		Vector3 maxA = boxAPos + boxASize;
+		Vector3 minA = boxAPos - boxASize;
+
+		Vector3 maxB = boxBPos + boxBSize;
+		Vector3 minB = boxBPos - boxBSize;
+
+		float distances[6] =
+		{
+			(maxB.x - minA.x),// distance of box ’b’ to ’left’ of ’a’.
+			(maxA.x - minB.x),// distance of box ’b’ to ’right’ of ’a’.
+			(maxB.y - minA.y),// distance of box ’b’ to ’bottom ’ of ’a’.
+			(maxA.y - minB.y),// distance of box ’b’ to ’top’ of ’a’.
+			(maxB.z - minA.z),// distance of box ’b’ to ’far’ of ’a’.
+			(maxA.z - minB.z) // distance of box ’b’ to ’near’ of ’a’.
+		};
+		float penetration = FLT_MAX;
+		Vector3 bestAxis;
+
+		for (int i = 0; i < 6; i++)
+		{
+			if (distances[i] < penetration) {
+				penetration =  distances[i];
+				bestAxis = transformA * transformB * faces[i];
+			}
+		}
+		collisionInfo.AddContactPoint(Vector3(), Vector3(),
+			bestAxis, penetration);
+		return true;
+	}
 	return false;
+
 }
 
 bool NCL::CollisionDetection::OBBSphereIntersection(const OBBVolume& volumeA, const Transform& worldTransformA, const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo)

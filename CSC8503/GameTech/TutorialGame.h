@@ -52,8 +52,11 @@ namespace NCL {
 			void Stairs();
 			void JumpPad1();
 			void JumpPad2();
-			void WobblingPlatforms();
-			void RotatingPlatform();
+			void AddRotatingBridges();
+			void RotatingBridges();
+			void AddRotatingPlatform();
+			void RotatingPlatform(float angle);
+			void WobblingPlatform();
 
 			Vector3 SpawnPoint = Vector3(-40, 10, -40);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
@@ -88,6 +91,9 @@ namespace NCL {
 			GameObject* floorb;
 			GameObject* Wallb4;
 			GameObject* rotatingplat;
+			GameObject* rotatingplat2;
+			GameObject* rotatingplat3;
+			GameObject* Wplat;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;

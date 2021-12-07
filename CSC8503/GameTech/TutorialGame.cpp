@@ -130,7 +130,8 @@ void TutorialGame::UpdateKeys() {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		//Ball->Respawn(SpawnPoint);
-		Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+		Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
 	}
 
 	if (Teleport1) {
@@ -291,8 +292,9 @@ void TutorialGame::InitWorld() {
 	Stairs();
 	JumpPad1();
 	JumpPad2();
-	WobblingPlatforms();
-	RotatingPlatform();
+	AddRotatingBridges();
+	AddRotatingPlatform();
+	WobblingPlatform();
 	//BridgeConstraintTest();
 }
 
@@ -580,29 +582,44 @@ void TutorialGame::JumpPad2() {
 	floorb->SetName("JumpPadB");
 }
 
-void TutorialGame::WobblingPlatforms() {
+void TutorialGame::AddRotatingBridges() {
 	auto plat1 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 	auto plat2 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 45, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 	auto plat3 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 90, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 }
 
-void TutorialGame::RotatingPlatform() {
-	rotatingplat = AddCubeToWorldOBB(Vector3(-3, 100 / 8 + 55, 100 / 8 * 7.75 + 1), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
-	Quaternion rotatePLAT = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 79);
+void TutorialGame::AddRotatingPlatform() {
+	rotatingplat = AddCubeToWorldOBB(Vector3(-25, 100 / 8 + 70, 100 / 8 * 7.75), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
+	rotatingplat->SetName("Spinner"); //Vector3(0, -14, -100/8 * 3.5); // Vector3(0, -25, -100/8 * 3);
+	rotatingplat2 = AddCubeToWorldOBB((rotatingplat->Position() + Vector3(0, -14, -100 / 8 * 3.5)), Vector3(100 / 16, 10, 2), 0);
+	rotatingplat2->SetName("Support");
+	rotatingplat3 = AddCubeToWorldOBB((rotatingplat->Position() + Vector3(0, -25, -100 / 8 * 3)), Vector3(100 / 16, 1, 100 / 12), 0);
+	rotatingplat3->SetName("RotatingPlatform");
+}
+
+void TutorialGame::RotatingPlatform(float angle) {	
+	Quaternion rotatePLAT = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), angle);
 	rotatingplat->SetOrientation(rotatePLAT);
-	rotatingplat->SetName("Spinner");
+	rotatingplat2->SetOrientation(rotatePLAT);
+	rotatingplat3->SetOrientation(rotatePLAT);
+	Matrix3 transform = Matrix3(rotatingplat->GetTransform().GetOrientation());
+	auto adjust2 = transform * Vector3(0, -14, -100 / 8 * 3.5);
+	auto adjust3 = transform * Vector3(0, -25, -100 / 8 * 3);
+	rotatingplat2->Respawn((rotatingplat->Position() + adjust2));
+	rotatingplat3->Respawn((rotatingplat->Position() + adjust3));
+}
+
+void TutorialGame::WobblingPlatform() {
+	Wplat = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 25, 100 / 8 * 10.75 + 1), Vector3(100 / 8 * 3, 1, 100 / 8 * 3), 0);
+	Wplat->SetName("WobblingPlatform");
+	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 45);
+	Wplat->SetOrientation(rotateWPLAT);
+	auto temp = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(4, 4, 4), 1);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
-	/*for (int x = 0; x < numCols; ++x) {
-		for (int z = 0; z < numRows; ++z) {
-			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
-			AddSphereToWorld(position, radius, 1.0f);
-		}
-	}*/ 
 	Ball = AddSphereToWorld(position, radius, inversemass);
 	Ball->SetName("Player");
-	//AddFloorToWorld(Vector3(0, -2, 0));
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -844,6 +861,14 @@ void TutorialGame::MoveSelectedObject() {
 		 stair8->Move(-stairlift);
 	 }
 
+	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
+		 RotatingPlatform(1);
+	 }
+
+	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
+		 RotatingPlatform(-1);
+	 }
+
 	 CollisionDetection::CollisionInfo info1;
 	 if (CollisionDetection::ObjectIntersection(Ball, stair9, info1))
 	 {
@@ -880,20 +905,21 @@ void TutorialGame::MoveSelectedObject() {
 		 Teleport1 = true;
 	 }
 
-	 CollisionDetection::CollisionInfo info5;
+	 /*CollisionDetection::CollisionInfo info5;
 	 if (CollisionDetection::ObjectIntersection(Ball, rotatingplat, info5)) {
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->ClearForces();
 		 Matrix3 transform = Matrix3(rotatingplat->GetTransform().GetOrientation());
 		 Matrix3 invTransform = Matrix3(rotatingplat->GetTransform().GetOrientation().Conjugate());
-		 auto sum = transform * rotatingplat->Position();
-		 auto adjust = transform * Vector3(0, -20, 20);
+		 auto adjust = transform * Vector3(0, -20, 40);
 		 Ball->Respawn((rotatingplat->Position() - adjust));
-	 }
+	 }*/
 
+	
 	 if (!selectionObject) {
-		 return;//we haven’t selected anything!qwqqsqdqdqd
+		 return;//we haven’t selected anything!
 	 }		
 		 //Push the selected object!
 	 if (Window::GetMouse()->ButtonPressed(NCL::MouseButtons::RIGHT)) {
