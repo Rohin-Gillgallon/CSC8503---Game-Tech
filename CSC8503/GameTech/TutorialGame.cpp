@@ -131,7 +131,8 @@ void TutorialGame::UpdateKeys() {
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		//Ball->Respawn(SpawnPoint);
 		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
-		Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
+		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
+		Ball->Respawn(mazeplat->Position() + Vector3(45, 5, 27));
 	}
 
 	if (Teleport1) {
@@ -281,28 +282,28 @@ void TutorialGame::InitWorld() {
 	AddMazePlatform();
 	AddProjectilePlatform();
 	AddGravityWell();
-	//BridgeConstraintTest();
+	BridgeConstraintTest();
 }
 
 void TutorialGame::BridgeConstraintTest() {
 	Vector3 cubeSize = Vector3(1, 1, 1);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
-	int numLinks = 10;
-	float maxDistance = 30; // constraint distance
-	float cubeDistance = 20; // distance between links
+	int numLinks = 6;
+	float maxDistance = 4; // constraint distance
+	float cubeDistance = 2.5; // distance between links
+	
+	Vector3 startPos = Vector3(120, 100 / 8 + 60, 100 / 8 * 18);
 
-	Vector3 startPos = Vector3(0, 20, 0);
-
-	GameObject* start = AddCubeToWorld(startPos + Vector3(0, 0, 0)
+	GameObject* start = AddCubeToWorldOBB(startPos + Vector3(0, 0, 0)
 		, cubeSize, 0);
-	GameObject* end = AddCubeToWorld(startPos + Vector3((numLinks + 2)
-		* cubeDistance, 0, 0), cubeSize, 0);
+	GameObject* end = AddCubeToWorldOBB(startPos + Vector3(0, 0, (numLinks + 2)
+		* cubeDistance), cubeSize, 0);
 
 	GameObject* previous = start;
 
 	for (int i = 0; i < numLinks; ++i) {
-		GameObject* block = AddCubeToWorld(startPos + Vector3((i + 1) *
+		GameObject* block = AddCubeToWorldOBB(startPos + Vector3((i + 1) *
 			cubeDistance, 0, 0), cubeSize, invCubeMass);
 		PositionConstraint* constraint = new PositionConstraint(previous,
 			block, maxDistance);
@@ -623,9 +624,6 @@ void TutorialGame::AddTravelPlatform() {
 
 void TutorialGame::TravelPlatform(Vector3 lift) {
 	liftcount = (lift.y > 0) ? liftcount + 1 : liftcount - 1;
-	Matrix3 transform = Matrix3(liftPlat->GetTransform().GetOrientation());
-	auto adjust2 = transform * Vector3(0, -8, -100 / 8 * 3.5);
-	auto adjust3 = transform * Vector3(0, -18, -100 / 8 * 3.25);
 	if (liftcount >= 0 && liftcount <= 800) {
 		liftPlat2->Move(lift);
 		liftPlat3->Move(lift);
@@ -633,17 +631,38 @@ void TutorialGame::TravelPlatform(Vector3 lift) {
 }
 
 void TutorialGame::AddMazePlatform() {
-	auto mazeplat = AddCubeToWorldOBB(Vector3(36, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	mazeplat = AddCubeToWorldOBB(Vector3(36, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	mazeplat->SetName("maze");
+	Matrix3 transform = Matrix3(mazeplat->GetTransform().GetOrientation());
+	auto maze1 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 36), 0);
+	auto adjust = transform * Vector3(-35, 7, 0);
+	maze1->Respawn(mazeplat->Position() + adjust);
+	auto maze2 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 27), 0);
+	auto adjust2 = transform * Vector3(35, 7, -9);
+	maze2->Respawn(mazeplat->Position() + adjust2);
+	auto maze3 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(35, 6, 1), 0);
+	auto adjust3 = transform * Vector3(1, 7, 35);
+	maze3->Respawn(mazeplat->Position() + adjust3);
+	auto maze4 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(26, 6, 1), 0);
+	auto adjust4 = transform * Vector3(8, 7, -35);
+	maze4->Respawn(mazeplat->Position() + adjust4);
+	auto maze5 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
+	auto adjust5 = transform * Vector3(-10.5, 7, -9);
+	maze5->Respawn(mazeplat->Position() + adjust5);
+	auto maze6 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
+	auto adjust6 = transform * Vector3(11.5, 7, 9);
+	maze6->Respawn(mazeplat->Position() + adjust6);
+	auto mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, -5, 27)), Vector3(9, 1, 9), 0);
 }
 
 void TutorialGame::AddProjectilePlatform() {
-	auto Projplat = AddCubeToWorldOBB(Vector3(112, 100 / 8 + 65, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto Projplat = AddCubeToWorldOBB(Vector3(124, 100 / 8 + 60, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Projplat->SetOrientation(rotateproj);
 }
 
 void TutorialGame::AddGravityWell() {
-	auto GravWell = AddCubeToWorldOBB(Vector3(188, 100 / 8 + 80, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto GravWell = AddCubeToWorldOBB(Vector3(200, 100 / 8 + 75, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {

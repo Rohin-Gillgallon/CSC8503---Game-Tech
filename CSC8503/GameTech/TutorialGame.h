@@ -104,6 +104,7 @@ namespace NCL {
 			GameObject* liftPlat;
 			GameObject* liftPlat2;
 			GameObject* liftPlat3;
+			GameObject* mazeplat;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
