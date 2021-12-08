@@ -618,24 +618,23 @@ void TutorialGame::WobblingPlatform() {
 	Wplat->SetName("WobblingPlatform");
 	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 0);
 	Wplat->SetOrientation(rotateWPLAT);
-	auto temp = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(4, 4, 4), 1);
 }
 
 void TutorialGame::AddTravelPlatform() {
-	liftPlat = AddCubeToWorldOBB(Vector3(50, 100 / 8 + 50, 100 / 8 * 15), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
+	liftPlat = AddCubeToWorldOBB(Vector3(50, 100 / 8 + 50, 100 / 8 * 15), Vector3(100 / 16, 2, 3.5 * 100 / 8), 0);
 	liftPlat->SetName("Spinner"); //Vector3(0, -14, -100/8 * 3.5); // Vector3(0, -25, -100/8 * 3);
-	liftPlat2 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -14, -100 / 8 * 3.5)), Vector3(100 / 16, 10, 2), 0);
+	liftPlat2 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -5, -100 / 8 * 3.5)), Vector3(100 / 16, 8, 1), 0);
 	liftPlat2->SetName("LiftSupport");
-	liftPlat3 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -25, -100 / 8 * 3)), Vector3(100 / 16, 1, 100 / 12), 0);
+	liftPlat3 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-40, -15, -100 / 8 * 3)), Vector3(100 / 16, 1, 100 / 12), 0);
 	liftPlat3->SetName("Lift");
 	Quaternion rotatelifta = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -90);
 	Quaternion rotateliftb = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -30);
 	liftPlat->SetOrientation(rotatelifta * rotateliftb);
-	liftPlat2->SetOrientation(rotatelifta * rotateliftb);
-	liftPlat3->SetOrientation(rotatelifta * rotateliftb);
+	liftPlat2->SetOrientation(rotatelifta);
+	liftPlat3->SetOrientation(rotatelifta);
 	Matrix3 transform = Matrix3(liftPlat->GetTransform().GetOrientation());
-	auto adjust2 = transform * Vector3(0, -14, -100 / 8 * 3.5);
-	auto adjust3 = transform * Vector3(0, -25, -100 / 8 * 3);
+	auto adjust2 = transform * Vector3(0, -8, -100 / 8 * 3.5);
+	auto adjust3 = transform * Vector3(0, -18, -100 / 8 * 3.25);
 	liftPlat2->Respawn((liftPlat->Position() + adjust2));
 	liftPlat3->Respawn((liftPlat->Position() + adjust3));
 }
@@ -656,7 +655,7 @@ void TutorialGame::AddGravityWell() {
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
 	Ball = AddSphereToWorld(position, radius, inversemass);
-	Ball->SetName("Player");
+	Ball->SetName("Ball");
 }
 
 void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing) {
@@ -942,17 +941,16 @@ void TutorialGame::MoveSelectedObject() {
 		 Teleport1 = true;
 	 }
 
-	 /*CollisionDetection::CollisionInfo info5;
-	 if (CollisionDetection::ObjectIntersection(Ball, rotatingplat, info5)) {
+	 CollisionDetection::CollisionInfo info5;
+	 if (CollisionDetection::ObjectIntersection(Ball, liftPlat2, info5)) {
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->ClearForces();
 		 Matrix3 transform = Matrix3(rotatingplat->GetTransform().GetOrientation());
-		 Matrix3 invTransform = Matrix3(rotatingplat->GetTransform().GetOrientation().Conjugate());
-		 auto adjust = transform * Vector3(0, -20, 40);
-		 Ball->Respawn((rotatingplat->Position() - adjust));
-	 }*/
+		 auto adjust = Vector3(0, 5, 0);
+		 Ball->Respawn((liftPlat2->Position() + adjust));
+	 }
 
 	
 	 if (!selectionObject) {
