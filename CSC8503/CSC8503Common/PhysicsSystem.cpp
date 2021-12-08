@@ -252,7 +252,7 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	Vector3 relativeB = p.localB;
 	
 	Vector3 angVelocityA =
-	Vector3::Cross(physA->GetAngularVelocity(), relativeA);
+	Vector3::Cross(physA->GetAngularVelocity(), relativeA); 
 	Vector3 angVelocityB =
 	Vector3::Cross(physB->GetAngularVelocity(), relativeB);
 	
@@ -260,27 +260,36 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	Vector3 fullVelocityB = physB->GetLinearVelocity() + angVelocityB;
 	
 	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
-
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
-	
+
+	Vector3 tangent = contactVelocity - (p.normal * (impulseForce));
+	Vector3 UnitTangent = (tangent == Vector3(0, 0, 0)) ? Vector3(0, 0, 0) : tangent / tangent.Length();
+
+	float impulseforceT = Vector3::Dot(contactVelocity, UnitTangent);
+
 	//now to work out the effect of inertia ....
 	Vector3 inertiaA = Vector3::Cross(physA->GetInertiaTensor() *
 	Vector3::Cross(relativeA, p.normal), relativeA);
 	Vector3 inertiaB = Vector3::Cross(physB->GetInertiaTensor() *
 	Vector3::Cross(relativeB, p.normal), relativeB);
+
 	float angularEffect = Vector3::Dot(inertiaA + inertiaB, p.normal);
+	float angularEffectT = Vector3::Dot(inertiaA + inertiaB, UnitTangent);
 	
 	float cRestitution = 0.66f; // disperse some kinectic energy
+	float coeffFriction = physA->GetFriction();
 	
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
-	
+	float jt = (-coeffFriction * impulseforceT) / (totalMass + angularEffectT);
+
 	Vector3 fullImpulse = p.normal * j;
+	Vector3 fullImpulseT = p.normal * j + UnitTangent * jt;
 
 	physA->ApplyLinearImpulse(-fullImpulse);
 	physB->ApplyLinearImpulse(fullImpulse);
 	
-	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
-	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulseT));
+	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulseT));
 }
 
 /*

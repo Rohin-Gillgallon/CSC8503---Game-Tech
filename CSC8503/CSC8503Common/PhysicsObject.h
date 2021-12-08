@@ -55,6 +55,10 @@ namespace NCL {
 				linearVelocity = v;
 			}
 
+			float GetFriction() {
+				return friction;
+			}
+
 			void SetAngularVelocity(const Vector3& v) {
 				angularVelocity = v;
 			}
