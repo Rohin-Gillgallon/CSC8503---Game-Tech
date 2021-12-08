@@ -130,8 +130,8 @@ void TutorialGame::UpdateKeys() {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		//Ball->Respawn(SpawnPoint);
-		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
-		Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
+		Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
 	}
 
 	if (Teleport1) {
@@ -142,24 +142,6 @@ void TutorialGame::UpdateKeys() {
 			Teleport1 = false;
 		}
 	}
-
-		/*if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::W))
-		{
-			direction = Vector3(0, 0, 1);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::S))
-		{r
-			direction = Vector3(0, 0, -1);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::A))
-		{
-			direction = Vector3(-1, 0, 0);
-		}
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::D))
-		{
-			direction = Vector3(1, 0, 0);
-		}*/
-	
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
 		useGravity = !useGravity; //Toggle gravity!
@@ -942,14 +924,14 @@ void TutorialGame::MoveSelectedObject() {
 	 }
 
 	 CollisionDetection::CollisionInfo info5;
-	 if (CollisionDetection::ObjectIntersection(Ball, liftPlat2, info5)) {
+	 if (CollisionDetection::ObjectIntersection(Ball, rotatingplat3, info5)) {
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->ClearForces();
-		 Matrix3 transform = Matrix3(rotatingplat->GetTransform().GetOrientation());
-		 auto adjust = Vector3(0, 5, 0);
-		 Ball->Respawn((liftPlat2->Position() + adjust));
+		 Matrix3 transform = Matrix3(rotatingplat3->GetTransform().GetOrientation());
+		 auto adjust = transform * Vector3(0, 6, 2);
+		 Ball->Respawn((rotatingplat3->Position() + adjust));a
 	 }
 
 	
