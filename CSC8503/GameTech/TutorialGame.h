@@ -58,6 +58,7 @@ namespace NCL {
 			void RotatingPlatform(float angle);
 			void WobblingPlatform();
 			void AddTravelPlatform();
+			void TravelPlatform(Vector3 lift);
 			void AddMazePlatform();
 			void AddProjectilePlatform();
 			void AddGravityWell();
@@ -75,6 +76,8 @@ namespace NCL {
 			bool Teleport1 = false;;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
+			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
+			int liftcount = 0;
 			float forceMagnitude;
 			Vector3 direction;
 

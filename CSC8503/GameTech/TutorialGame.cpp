@@ -130,8 +130,8 @@ void TutorialGame::UpdateKeys() {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		//Ball->Respawn(SpawnPoint);
-		Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
-		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
+		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+		Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
 	}
 
 	if (Teleport1) {
@@ -605,9 +605,9 @@ void TutorialGame::WobblingPlatform() {
 void TutorialGame::AddTravelPlatform() {
 	liftPlat = AddCubeToWorldOBB(Vector3(50, 100 / 8 + 50, 100 / 8 * 15), Vector3(100 / 16, 2, 3.5 * 100 / 8), 0);
 	liftPlat->SetName("Spinner"); //Vector3(0, -14, -100/8 * 3.5); // Vector3(0, -25, -100/8 * 3);
-	liftPlat2 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-50, -5, -100 / 8 * 3.5)), Vector3(100 / 16, 8, 1), 0);
+	liftPlat2 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(100 / 16, 8, 1), 0);
 	liftPlat2->SetName("LiftSupport");
-	liftPlat3 = AddCubeToWorldOBB((liftPlat->Position() + Vector3(-40, -15, -100 / 8 * 3)), Vector3(100 / 16, 1, 100 / 12), 0);
+	liftPlat3 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(100 / 16, 1, 100 / 12), 0);
 	liftPlat3->SetName("Lift");
 	Quaternion rotatelifta = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -90);
 	Quaternion rotateliftb = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -30);
@@ -621,18 +621,29 @@ void TutorialGame::AddTravelPlatform() {
 	liftPlat3->Respawn((liftPlat->Position() + adjust3));
 }
 
+void TutorialGame::TravelPlatform(Vector3 lift) {
+	liftcount = (lift.y > 0) ? liftcount + 1 : liftcount - 1;
+	Matrix3 transform = Matrix3(liftPlat->GetTransform().GetOrientation());
+	auto adjust2 = transform * Vector3(0, -8, -100 / 8 * 3.5);
+	auto adjust3 = transform * Vector3(0, -18, -100 / 8 * 3.25);
+	if (liftcount >= 0 && liftcount <= 800) {
+		liftPlat2->Move(lift);
+		liftPlat3->Move(lift);
+	}
+}
+
 void TutorialGame::AddMazePlatform() {
-	auto mazeplat = AddCubeToWorldOBB(Vector3(0, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto mazeplat = AddCubeToWorldOBB(Vector3(36, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 }
 
 void TutorialGame::AddProjectilePlatform() {
-	auto Projplat = AddCubeToWorldOBB(Vector3(75, 100 / 8 + 65, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto Projplat = AddCubeToWorldOBB(Vector3(112, 100 / 8 + 65, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Projplat->SetOrientation(rotateproj);
 }
 
 void TutorialGame::AddGravityWell() {
-	auto GravWell = AddCubeToWorldOBB(Vector3(150, 100 / 8 + 80, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto GravWell = AddCubeToWorldOBB(Vector3(188, 100 / 8 + 80, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
@@ -881,10 +892,12 @@ void TutorialGame::MoveSelectedObject() {
 
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
 		 RotatingPlatform(1);
+		 TravelPlatform(platLift);
 	 }
 
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
 		 RotatingPlatform(-1);
+		 TravelPlatform(-platLift);
 	 }
 
 	 CollisionDetection::CollisionInfo info1;
@@ -931,9 +944,19 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->GetPhysicsObject()->ClearForces();
 		 Matrix3 transform = Matrix3(rotatingplat3->GetTransform().GetOrientation());
 		 auto adjust = transform * Vector3(0, 6, 2);
-		 Ball->Respawn((rotatingplat3->Position() + adjust));a
+		 Ball->Respawn((rotatingplat3->Position() + adjust));
 	 }
 
+	 CollisionDetection::CollisionInfo info6;
+	 if (CollisionDetection::ObjectIntersection(Ball, liftPlat3, info6)) {
+		 
+		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->ClearForces();
+		 Matrix3 transform = Matrix3(liftPlat3->GetTransform().GetOrientation());
+		 auto adjust = transform * Vector3(0, -1.25, 10);
+		 Ball->Respawn((liftPlat2->Position() + adjust));
+	 }
 	
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
