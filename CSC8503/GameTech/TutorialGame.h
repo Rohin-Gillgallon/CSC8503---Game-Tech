@@ -1,6 +1,7 @@
 #pragma once
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
+#include "StateGameObject.h"
 
 
 
@@ -44,6 +45,9 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position);
 			GameObject* AddEnemyToWorld(const Vector3& position);
 			GameObject* AddBonusToWorld(const Vector3& position);
+
+			StateGameObject* AddStateObjectToWorld(const Vector3& position);
+			StateGameObject* testStateObject;
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
@@ -105,6 +109,8 @@ namespace NCL {
 			GameObject* liftPlat2;
 			GameObject* liftPlat3;
 			GameObject* mazeplat;
+
+			
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;

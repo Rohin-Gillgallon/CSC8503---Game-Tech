@@ -7,6 +7,7 @@
 #include "../CSC8503Common/Constraint.h"
 #include "../../Common/Quaternion.h"
 #include "../../Common/Vector3.h"
+#include "StateGameObject.h"
 
 
 using namespace NCL;
@@ -75,6 +76,10 @@ TutorialGame::~TutorialGame()	{
 void TutorialGame::UpdateGame(float dt) {
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
+	}
+
+	if (testStateObject) {
+		testStateObject->Update(dt);
 	}
 
 	UpdateKeys();
@@ -267,11 +272,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
+	//testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
+	//InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
 	InitDefaultFloor();
-	InitAddObstacles();
+	/*InitAddObstacles();
 	Stairs();
 	JumpPad1();
 	JumpPad2();
@@ -282,7 +288,7 @@ void TutorialGame::InitWorld() {
 	AddMazePlatform();
 	AddProjectilePlatform();
 	AddGravityWell();
-	BridgeConstraintTest();
+	BridgeConstraintTest();*/
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -774,13 +780,33 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position) {
 GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	GameObject* apple = new GameObject();
 
-	SphereVolume* volume = new SphereVolume(0.25f);
+	SphereVolume* volume = new SphereVolume(0.5f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
 	apple->GetTransform()
 		.SetScale(Vector3(0.25, 0.25, 0.25))
 		.SetPosition(position);
 
 	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
+	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
+
+	apple->GetPhysicsObject()->SetInverseMass(1.0f);
+	apple->GetPhysicsObject()->InitSphereInertia();
+
+	world->AddGameObject(apple);
+
+	return apple;
+}
+
+StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position) {
+	StateGameObject* apple = new StateGameObject();
+
+	SphereVolume* volume = new SphereVolume(0.25f);
+	apple->SetBoundingVolume((CollisionVolume*)volume);
+	apple->GetTransform()
+		.SetScale(Vector3(0.5, 0.5, 0.5))
+		.SetPosition(position);
+
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), sphereMesh, nullptr, basicShader));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -893,7 +919,7 @@ void TutorialGame::MoveSelectedObject() {
 	
 	 forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 	
-	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
+	/* if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
 	 {
 		 stair2->Move(stairlift);
 		 stair4->Move(stairlift);
@@ -976,7 +1002,7 @@ void TutorialGame::MoveSelectedObject() {
 		 auto adjust = transform * Vector3(0, -1.25, 10);
 		 Ball->Respawn((liftPlat2->Position() + adjust));
 	 }
-	
+	*/
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		
