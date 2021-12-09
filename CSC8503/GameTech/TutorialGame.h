@@ -66,6 +66,11 @@ namespace NCL {
 			void AddMazePlatform();
 			void AddProjectilePlatform();
 			void AddGravityWell();
+			void AddBridge();
+			void AddBouncePad();
+			void AddIcePatch();
+			void AddTeleport();
+			void AddGoal();
 
 			Vector3 SpawnPoint = Vector3(-40, 10, -40);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
@@ -77,7 +82,8 @@ namespace NCL {
 			bool jumppad2 = false;
 			bool jumppadcollision1 = true;
 			bool jumppadcollision2 = true;
-			bool Teleport1 = false;;
+			bool Teleport1 = false;
+			bool Teleport2 = false;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
@@ -109,7 +115,9 @@ namespace NCL {
 			GameObject* liftPlat2;
 			GameObject* liftPlat3;
 			GameObject* mazeplat;
-
+			GameObject* bounce;
+			GameObject* teleport;
+			GameObject* goal;
 			
 
 			OGLMesh*	capsuleMesh = nullptr;

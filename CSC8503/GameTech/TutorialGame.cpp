@@ -132,17 +132,27 @@ void TutorialGame::UpdateKeys() {
 		//Ball->Respawn(SpawnPoint);
 		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
 		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
-		Ball->Respawn(mazeplat->Position() + Vector3(45, 5, 27));
+		//Ball->Respawn(mazeplat->Position() + Vector3(45, 5, 27));
+		Ball->Respawn(Vector3(206, 100 / 8 + 45, 100 / 8 * 15.5));
 	}
 
-	if (Teleport1) {
-		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
+		if (Teleport1) {
 			useGravity = false;
 			Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
 			useGravity = true;
 			Teleport1 = false;
 		}
+		else if (Teleport2) {
+			useGravity = false;
+			Ball->Respawn(Vector3(206 - 100 / 8 * 2, 100 / 8 + 20, 100 / 8 * 9));
+			useGravity = true;
+			Teleport2 = false;
+		}
+		else 
+			return;
 	}
+
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
 		useGravity = !useGravity; //Toggle gravity!
@@ -283,6 +293,11 @@ void TutorialGame::InitWorld() {
 	AddProjectilePlatform();
 	AddGravityWell();
 	BridgeConstraintTest();
+	AddBridge();
+	AddBouncePad();
+	AddIcePatch();
+	AddTeleport();
+	AddGoal();
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -502,6 +517,7 @@ void TutorialGame::InitAddObstacles() {
 	auto obs19 = AddCubeToWorld(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
 	auto obs20 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
 	auto obs21 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
+	auto obs22 = AddCubeToWorld(Vector3(100 / 8 * 13.5 + 100 / 12, 100 / 12 + 57.5, 100 / 8 * 4.75 + 1), Vector3(1, 100 / 8, 100 / 8), 0);
 }
 
 void TutorialGame::Stairs() {
@@ -573,6 +589,10 @@ void TutorialGame::AddRotatingBridges() {
 	auto plat1 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 	auto plat2 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 45, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 	auto plat3 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 90, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+}
+
+void TutorialGame::RotatingBridges() {
+
 }
 
 void TutorialGame::AddRotatingPlatform() {
@@ -678,6 +698,34 @@ void TutorialGame::AddProjectilePlatform() {
 
 void TutorialGame::AddGravityWell() {
 	auto GravWell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
+}
+
+void TutorialGame::AddBridge() {
+	auto bridge = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 35, 100 / 8 * 16 - (100 / 8 * 2)), Vector3(100 / 8, 1, 100 / 8 * 2), 0);
+	Quaternion rotatebridge = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -25);
+	bridge->SetOrientation(rotatebridge);
+}
+
+void TutorialGame::AddBouncePad() {
+	bounce = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 10, 100 / 8 * 11), Vector3(100 / 8, 1, 100 / 8), 0);
+}
+
+void TutorialGame::AddIcePatch() {
+	auto ice1 = AddCubeToWorld(Vector3(206, 100 / 8 + 20, 100 / 8 * 7), Vector3(100 / 8, 1, 100 / 8 * 3), 0);
+	ice1->GetPhysicsObject()->SetFriction(0.1);
+	auto ice2 = AddCubeToWorld(Vector3(206 - 100 / 8 * 2, 100 / 8 + 20, 100 / 8 *8), Vector3(100 / 8, 1, 100 / 8), 0);
+	ice2->GetPhysicsObject()->SetFriction(0.1);
+	auto ice3 = AddCubeToWorld(Vector3(206 + 100 / 8 * 2, 100 / 8 + 20, 100 / 8 * 8), Vector3(100 / 8, 1, 100 / 8), 0);
+	ice3->GetPhysicsObject()->SetFriction(0.1);
+}
+
+void TutorialGame::AddTeleport() {
+	teleport = AddCubeToWorld(Vector3(206, 100 / 8 + 20, 100 / 8 * 3), Vector3(100 / 8, 1, 100 / 8), 0);
+	teleport->GetPhysicsObject()->SetFriction(100);
+}
+
+void TutorialGame::AddGoal() {
+	goal = AddCubeToWorld(Vector3(206 + 100 / 8 * 4, 100 / 8 + 20, 100 / 8 * 8), Vector3(100 / 8, 1, 100 / 8), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
@@ -948,7 +996,7 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 		 useGravity = true;
-		 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 4000, Vector3(200.149, 12.2566, -2.58092));
+		 Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 4250, Vector3(200.149, 12.2566, -2.58092));
 	 }
 
 	 CollisionDetection::CollisionInfo info3;
@@ -956,7 +1004,7 @@ void TutorialGame::MoveSelectedObject() {
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12 - 1, 100 / 8 + 4, 100 / 8 * 4.75 + 1));
+		 Ball->Respawn(Vector3(206, 100 / 8 + 20, 100 / 8 * 4));
 		 useGravity = true;
 	 }
 
@@ -992,6 +1040,26 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->Respawn((liftPlat2->Position() + adjust));
 	 }
 	
+	 /*CollisionDetection::CollisionInfo info7;
+	 if (CollisionDetection::ObjectIntersection(Ball, bounce, info7)) {
+		 float x = -30;
+		 float k = 200;
+		 Vector3 KVector(k, k, k);
+		 bounce->Move(bounce->Position() + Vector3(0, x, 0));
+		 Vector3 hookes = -KVector * Vector3(0, x, 0);
+		 Ball->GetPhysicsObject()->AddForce(hookes);
+		 bounce->Move(bounce->Position() - Vector3(0, x, 0));
+	 }*/
+
+	 CollisionDetection::CollisionInfo info8;
+	 if (CollisionDetection::ObjectIntersection(Ball, teleport, info8)) {
+
+		 useGravity = false;
+		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Teleport2 = true;
+	 }
+
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		
