@@ -7,7 +7,6 @@
 #include "../CSC8503Common/Constraint.h"
 #include "../../Common/Quaternion.h"
 #include "../../Common/Vector3.h"
-#include "StateGameObject.h"
 
 
 using namespace NCL;
@@ -76,10 +75,6 @@ TutorialGame::~TutorialGame()	{
 void TutorialGame::UpdateGame(float dt) {
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
-	}
-
-	if (testStateObject) {
-		testStateObject->Update(dt);
 	}
 
 	UpdateKeys();
@@ -272,12 +267,11 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//testStateObject = AddStateObjectToWorld(Vector3(0, 10, 0));
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	//InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
+	InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
 	InitDefaultFloor();
-	/*InitAddObstacles();
+	InitAddObstacles();
 	Stairs();
 	JumpPad1();
 	JumpPad2();
@@ -288,7 +282,7 @@ void TutorialGame::InitWorld() {
 	AddMazePlatform();
 	AddProjectilePlatform();
 	AddGravityWell();
-	BridgeConstraintTest();*/
+	BridgeConstraintTest();
 }
 
 void TutorialGame::BridgeConstraintTest() {
@@ -659,16 +653,31 @@ void TutorialGame::AddMazePlatform() {
 	auto adjust6 = transform * Vector3(11.5, 7, 9);
 	maze6->Respawn(mazeplat->Position() + adjust6);
 	auto mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, -5, 27)), Vector3(9, 1, 9), 0);
+	auto mazeExitWall1 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 36)), Vector3(9, 9, 1), 0);
+	auto mazeExitWall2 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 18)), Vector3(9, 9, 1), 0);
 }
 
 void TutorialGame::AddProjectilePlatform() {
 	auto Projplat = AddCubeToWorldOBB(Vector3(124, 100 / 8 + 60, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Projplat->SetOrientation(rotateproj);
+	auto projplatbase = AddCubeToWorldOBB(Vector3(100, 100 / 8 + 60, 100 / 8 * 18.25), Vector3(1, 9, 27), 0);
+	Quaternion rotateprojbasea = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
+	Quaternion rotateprojbaseb = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -15);
+	projplatbase->SetOrientation(rotateprojbasea * rotateprojbaseb);
+	auto projplattopa = AddCubeToWorldOBB(Vector3(140, 100 / 8 + 70, 100 / 8 * 17.2), Vector3(1, 9, 18), 0);
+	Quaternion rotateprojtopa1 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
+	Quaternion rotateprojtopa2 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 45);
+	projplattopa->SetOrientation(rotateprojtopa1 * rotateprojtopa2);
+
+	auto projplattopb = AddCubeToWorldOBB(Vector3(140, 100 / 8 + 70, 100 / 8 * 21), Vector3(1, 9, 18), 0);
+	Quaternion rotateprojtopb1 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
+	Quaternion rotateprojtopb2 = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -45);
+	projplattopb->SetOrientation(rotateprojtopb1 * rotateprojtopb2);
 }
 
 void TutorialGame::AddGravityWell() {
-	auto GravWell = AddCubeToWorldOBB(Vector3(200, 100 / 8 + 75, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto GravWell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
 }
 
 void TutorialGame::InitSphereGridWorld(Vector3 position, float radius, float inversemass) {
@@ -780,33 +789,13 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position) {
 GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	GameObject* apple = new GameObject();
 
-	SphereVolume* volume = new SphereVolume(0.5f);
+	SphereVolume* volume = new SphereVolume(0.25f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
 	apple->GetTransform()
 		.SetScale(Vector3(0.25, 0.25, 0.25))
 		.SetPosition(position);
 
 	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
-	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
-
-	apple->GetPhysicsObject()->SetInverseMass(1.0f);
-	apple->GetPhysicsObject()->InitSphereInertia();
-
-	world->AddGameObject(apple);
-
-	return apple;
-}
-
-StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position) {
-	StateGameObject* apple = new StateGameObject();
-
-	SphereVolume* volume = new SphereVolume(0.25f);
-	apple->SetBoundingVolume((CollisionVolume*)volume);
-	apple->GetTransform()
-		.SetScale(Vector3(0.5, 0.5, 0.5))
-		.SetPosition(position);
-
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), sphereMesh, nullptr, basicShader));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -919,7 +908,7 @@ void TutorialGame::MoveSelectedObject() {
 	
 	 forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 	
-	/* if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
+	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
 	 {
 		 stair2->Move(stairlift);
 		 stair4->Move(stairlift);
@@ -1002,7 +991,7 @@ void TutorialGame::MoveSelectedObject() {
 		 auto adjust = transform * Vector3(0, -1.25, 10);
 		 Ball->Respawn((liftPlat2->Position() + adjust));
 	 }
-	*/
+	
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		
