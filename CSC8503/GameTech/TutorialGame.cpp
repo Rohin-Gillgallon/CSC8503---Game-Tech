@@ -133,7 +133,8 @@ void TutorialGame::UpdateKeys() {
 		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
 		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
 		//Ball->Respawn(mazeplat->Position() + Vector3(45, 5, 27));
-		Ball->Respawn(Vector3(206, 100 / 8 + 45, 100 / 8 * 15.5));
+		//Ball->Respawn(Vector3(206, 100 / 8 + 45, 100 / 8 * 15.5));
+		Ball->Respawn(Vector3(201 - 100 / 8 * 3, 100 / 8 + 80, 100 / 8 * 19.5));
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
@@ -145,7 +146,7 @@ void TutorialGame::UpdateKeys() {
 		}
 		else if (Teleport2) {
 			useGravity = false;
-			Ball->Respawn(Vector3(206 - 100 / 8 * 2, 100 / 8 + 20, 100 / 8 * 9));
+			Ball->Respawn(Vector3(206 - 100 / 8 * 2, 100 / 8 + 30, 100 / 8 * 8));
 			useGravity = true;
 			Teleport2 = false;
 		}
@@ -697,7 +698,8 @@ void TutorialGame::AddProjectilePlatform() {
 }
 
 void TutorialGame::AddGravityWell() {
-	auto GravWell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
+	gravwell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
+	gravwell->GetPhysicsObject()->gravitywell = true;
 }
 
 void TutorialGame::AddBridge() {
@@ -707,7 +709,8 @@ void TutorialGame::AddBridge() {
 }
 
 void TutorialGame::AddBouncePad() {
-	bounce = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 10, 100 / 8 * 11), Vector3(100 / 8, 1, 100 / 8), 0);
+	bounce = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 10, 100 / 8 * 11), Vector3(100 / 8, restinglength, 100 / 8), 0);
+	bounce->GetPhysicsObject()->spring = true;
 }
 
 void TutorialGame::AddIcePatch() {
@@ -1040,24 +1043,21 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->Respawn((liftPlat2->Position() + adjust));
 	 }
 	
-	 /*CollisionDetection::CollisionInfo info7;
-	 if (CollisionDetection::ObjectIntersection(Ball, bounce, info7)) {
-		 float x = -30;
-		 float k = 200;
-		 Vector3 KVector(k, k, k);
-		 bounce->Move(bounce->Position() + Vector3(0, x, 0));
-		 Vector3 hookes = -KVector * Vector3(0, x, 0);
-		 Ball->GetPhysicsObject()->AddForce(hookes);
-		 bounce->Move(bounce->Position() - Vector3(0, x, 0));
-	 }*/
-
-	 CollisionDetection::CollisionInfo info8;
-	 if (CollisionDetection::ObjectIntersection(Ball, teleport, info8)) {
+	 CollisionDetection::CollisionInfo info7;
+	 if (CollisionDetection::ObjectIntersection(Ball, teleport, info7)) {
 
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Ball->Respawn((teleport->Position() + Vector3(0, 5, 0)));
 		 Teleport2 = true;
+	 }
+
+	 auto sum = (Ball->Position() - gravwell->Position() - Vector3(0, 6, 0)).Length();
+	 if ((Ball->Position() - gravwell->Position() - Vector3(0, 6, 0)).Length() < 1.0f) {
+		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		 Ball->Respawn(gravwell->Position() - Vector3(0, 6, 0));
 	 }
 
 	 if (!selectionObject) {

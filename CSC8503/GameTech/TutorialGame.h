@@ -88,6 +88,7 @@ namespace NCL {
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
 			int liftcount = 0;
+			float restinglength = 2;
 			float forceMagnitude;
 			Vector3 direction;
 
@@ -115,6 +116,7 @@ namespace NCL {
 			GameObject* liftPlat2;
 			GameObject* liftPlat3;
 			GameObject* mazeplat;
+			GameObject* gravwell;
 			GameObject* bounce;
 			GameObject* teleport;
 			GameObject* goal;

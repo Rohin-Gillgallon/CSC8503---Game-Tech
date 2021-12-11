@@ -22,6 +22,7 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
+
 		protected:
 			void BasicCollisionDetection();
 			void BroadPhase();
@@ -39,6 +40,7 @@ namespace NCL {
 
 			void ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 			void ResolveSpringCollisions(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const;
+			Vector3 GravitationalAttraction(GameObject& a, GameObject& b) const;
 
 			GameWorld& gameWorld;
 

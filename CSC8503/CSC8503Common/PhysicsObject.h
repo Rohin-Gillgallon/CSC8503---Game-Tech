@@ -81,6 +81,8 @@ namespace NCL {
 			}
 
 			bool spring = false;
+			bool gravitywell = false;
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;

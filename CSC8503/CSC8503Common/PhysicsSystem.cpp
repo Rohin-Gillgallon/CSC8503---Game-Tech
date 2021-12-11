@@ -24,7 +24,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	useBroadPhase	= false;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.2f;
-	SetGravity(Vector3(0.0f, 4 * -9.8f, 0.0f));
+	SetGravity(Vector3(0.0f, -4 * 9.8f, 0.0f));
 }
 
 PhysicsSystem::~PhysicsSystem()	{
@@ -212,9 +212,19 @@ void PhysicsSystem::BasicCollisionDetection() {
 			CollisionDetection::CollisionInfo info;
 			if (CollisionDetection::ObjectIntersection(*i, *j, info))
 			{
-				std::cout << "Collision between " << (*i)->GetName()
-					<< " and " << (*j)->GetName() << std::endl;
-				ImpulseResolveCollision(*info.a, *info.b, info.point);
+				/*std::cout << "Collision between " << (*i)->GetName()
+					<< " and " << (*j)->GetName() << std::endl;*/
+				if ((*i)->GetPhysicsObject()->spring == false && (*j)->GetPhysicsObject()->spring == true)
+					ResolveSpringCollisions(*info.a, *info.b, info.point);
+				else if ((*i)->GetPhysicsObject()->spring == true && (*j)->GetPhysicsObject()->spring == false)
+				{
+					auto temp = i;
+					i = j;
+					j = temp;
+					ResolveSpringCollisions(*info.a, *info.b, info.point);
+				}
+				else
+					ImpulseResolveCollision(*info.a, *info.b, info.point);
 				info.framesLeft = numCollisionFrames;
 				allCollisions.insert(info);
 			}
@@ -229,6 +239,7 @@ so that objects separate back out.
 
 */
 void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject * physB = b.GetPhysicsObject();
 	
@@ -276,14 +287,16 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	float angularEffect = Vector3::Dot(inertiaA + inertiaB, p.normal);
 	float angularEffectT = Vector3::Dot(inertiaA + inertiaB, UnitTangent);
 	
-	float cRestitution = 0.46f; // disperse some kinectic energy
+	float cRestitution = 0.6f; // disperse some kinectic energy
 	float coeffFriction = physA->GetFriction() * physB->GetFriction();
 	
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
 	float jt = (-coeffFriction * impulseforceT) / (totalMass + angularEffectT);
 
-	Vector3 fullImpulse = p.normal * j;
-	Vector3 fullImpulseT = p.normal * j + UnitTangent * jt;
+	Vector3 Attraction = GravitationalAttraction(a, b);
+
+	Vector3 fullImpulse = p.normal * j + Attraction;
+	Vector3 fullImpulseT = p.normal * j + UnitTangent * jt + Attraction;
 
 	physA->ApplyLinearImpulse(-fullImpulse);
 	physB->ApplyLinearImpulse(fullImpulse);
@@ -292,6 +305,42 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulseT));
 }
 
+
+void PhysicsSystem::ResolveSpringCollisions(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+
+	Vector3 relativeA = p.localA;
+	Vector3 relativeB = p.localB;
+
+	float penetration = p.penetration;
+
+	float force = 120 * penetration;
+	Vector3 fullImpulse = p.normal * force;
+	physA->ApplyLinearImpulse(-fullImpulse);
+	physB->ApplyLinearImpulse(fullImpulse);
+
+	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
+	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+}
+
+Vector3 PhysicsSystem::GravitationalAttraction(GameObject& a, GameObject& b) const {
+	if (a.GetPhysicsObject()->gravitywell) {
+		Vector3 distance = a.Position() - b.Position();
+		float imass1 = (a.GetPhysicsObject()->GetInverseMass() == 0) ? 0.0001 : a.GetPhysicsObject()->GetInverseMass();
+		float imass2 = (b.GetPhysicsObject()->GetInverseMass() == 0) ? 0.0001 : b.GetPhysicsObject()->GetInverseMass();
+		float mass1 = 1 / imass1;
+		float mass2 = 1 / imass2;
+		float G = 0.05;
+		float strength = G * (mass1 * mass2) / (distance.LengthSquared());
+		Vector3 GForce = (distance / distance.Length()) * strength;
+		GForce.x = (GForce.x > 0.5) ? GForce.x / 2 : GForce.x;
+		GForce.z = (GForce.z > 0.5) ? GForce.z / 2 : GForce.z;
+		return GForce;
+	}
+	else return Vector3(0, 0, 0);
+}
 /*
 
 Later, we replace the BasicCollisionDetection method with a broadphase
@@ -372,7 +421,7 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 		float inverseMass = object->GetInverseMass();
 
 		Vector3 linearVel = object->GetLinearVelocity();
-		Vector3 force = object->GetForce();
+		Vector3 force = object->GetForce() + Vector3(0, 0, 0);
 		Vector3 accel = force * inverseMass;
 
 		if (applyGravity && inverseMass > 0) {
