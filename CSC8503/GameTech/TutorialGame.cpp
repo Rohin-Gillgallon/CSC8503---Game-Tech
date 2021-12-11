@@ -703,7 +703,7 @@ void TutorialGame::AddGravityWell() {
 }
 
 void TutorialGame::AddBridge() {
-	auto bridge = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 35, 100 / 8 * 16 - (100 / 8 * 2)), Vector3(100 / 8, 1, 100 / 8 * 2), 0);
+	auto bridge = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 35, 100 / 8 * 14.5), Vector3(100 / 8, 1, 100 / 8 * 2), 0);
 	Quaternion rotatebridge = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), -25);
 	bridge->SetOrientation(rotatebridge);
 }
@@ -1049,7 +1049,6 @@ void TutorialGame::MoveSelectedObject() {
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 Ball->Respawn((teleport->Position() + Vector3(0, 5, 0)));
 		 Teleport2 = true;
 	 }
 
