@@ -57,13 +57,15 @@ namespace NCL {
 			void JumpPad1();
 			void JumpPad2();
 			void AddRotatingBridges();
-			void RotatingBridges();
+			void RotatingBridges(float angle);
 			void AddRotatingPlatform();
 			void RotatingPlatform(float angle);
-			void WobblingPlatform();
+			void AddWobblingPlatform();
+			void WobblingPlatform(float angle, std::string dir);
 			void AddTravelPlatform();
 			void TravelPlatform(Vector3 lift);
 			void AddMazePlatform();
+			void mazePlatform(float angle, std::string dir);
 			void AddProjectilePlatform();
 			void AddGravityWell();
 			void AddBridge();
@@ -74,6 +76,10 @@ namespace NCL {
 
 			Vector3 SpawnPoint = Vector3(-40, 10, -40);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
+			Vector3 Checkpoint2 = Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1);
+			Vector3 Checkpoint3 = Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1);
+			Vector3 Checkpoint4 = Vector3(81, 100/8+55, 100/8*19+27);
+			Vector3 Checkpoint5 = Vector3(201 - 100 / 8 * 3, 100 / 8 + 80, 100 / 8 * 19.5);
 
 			bool useGravity;
 			bool inSelectionMode;
@@ -82,16 +88,18 @@ namespace NCL {
 			bool jumppad2 = false;
 			bool jumppadcollision1 = true;
 			bool jumppadcollision2 = true;
+			bool bridgeproject = false;
+			bool hold = false;
 			bool Teleport1 = false;
 			bool Teleport2 = false;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
 			int liftcount = 0;
-			float restinglength = 2;
 			float forceMagnitude;
 			Vector3 direction;
 
+			GameObject* ActiveObject = nullptr;
 			GameObject* selectionObject = nullptr;
 			GameObject* selectionObject2 = nullptr;
 			GameObject* Ball = nullptr;
@@ -108,14 +116,25 @@ namespace NCL {
 			GameObject* floora;
 			GameObject* floorb;
 			GameObject* Wallb4;
+			GameObject* plat1;
+			GameObject* plat2;
+			GameObject* plat3;
 			GameObject* rotatingplat;
 			GameObject* rotatingplat2;
 			GameObject* rotatingplat3;
+			GameObject* obs21;
 			GameObject* Wplat;
 			GameObject* liftPlat;
 			GameObject* liftPlat2;
 			GameObject* liftPlat3;
+			GameObject* maze1;
+			GameObject* maze2;
+			GameObject* maze3;
+			GameObject* maze4;
+			GameObject* maze5;
+			GameObject* maze6;
 			GameObject* mazeplat;
+			GameObject* mazeExit;
 			GameObject* gravwell;
 			GameObject* bounce;
 			GameObject* teleport;

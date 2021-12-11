@@ -28,11 +28,11 @@ TutorialGame::TutorialGame()	{
 }
 
 /*
-
+t
 Each of the little demo scenarios used in the game uses the same 2 meshes, 
 and the same texture and shader. There's no need to ever load in anything else
 for this module, even in the coursework, but you can add it if you like!
-
+ 
 */
 void TutorialGame::InitialiseAssets() {
 	auto loadFunc = [](const string& name, OGLMesh** into) {
@@ -129,19 +129,17 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
 		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		//Ball->Respawn(SpawnPoint);
-		//Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
-		//Ball->Respawn(Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1));
-		//Ball->Respawn(mazeplat->Position() + Vector3(45, 5, 27));
-		//Ball->Respawn(Vector3(206, 100 / 8 + 45, 100 / 8 * 15.5));
-		Ball->Respawn(Vector3(201 - 100 / 8 * 3, 100 / 8 + 80, 100 / 8 * 19.5));
+		Ball->Respawn(SpawnPoint);
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
 		if (Teleport1) {
 			useGravity = false;
-			Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1));
+			Ball->Respawn(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 52, 100 / 8 * 4.75 + 1));
 			useGravity = true;
+			std::cout << "Checkpoint Reached\n";
+			SpawnPoint = Checkpoint2;
+			bridgeproject = true;
 			Teleport1 = false;
 		}
 		else if (Teleport2) {
@@ -154,6 +152,14 @@ void TutorialGame::UpdateKeys() {
 			return;
 	}
 
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::H)) {
+		hold = !hold;
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::J)) {
+		if(bridgeproject)
+			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-1, 0, 0) * 2500, Vector3(164, 58, 58));
+	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::G)) {
 		useGravity = !useGravity; //Toggle gravity!
@@ -228,7 +234,7 @@ void TutorialGame::LockedObjectMovement() {
 
 void TutorialGame::DebugObjectMovement() {
 //If we've selected an object, we can manipulate it with some key presses
-	if (inSelectionMode && selectionObject) {
+	/*if (inSelectionMode && selectionObject) {
 		//Twist the selected object!
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
 			selectionObject->GetPhysicsObject()->AddTorque(Vector3(-10, 0, 0));
@@ -261,7 +267,7 @@ void TutorialGame::DebugObjectMovement() {
 		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::NUM5)) {
 			selectionObject->GetPhysicsObject()->AddForce(Vector3(0, -10, 0));
 		}
-	}
+	}*/
 
 }
 
@@ -288,7 +294,7 @@ void TutorialGame::InitWorld() {
 	JumpPad2();
 	AddRotatingBridges();
 	AddRotatingPlatform();
-	WobblingPlatform();
+	AddWobblingPlatform();
 	AddTravelPlatform();
 	AddMazePlatform();
 	AddProjectilePlatform();
@@ -516,8 +522,8 @@ void TutorialGame::InitAddObstacles() {
 	obs18->SetOrientation(rotate18a * rotate18b * rotate18c);
 
 	auto obs19 = AddCubeToWorld(Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
-	auto obs20 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
-	auto obs21 = AddCubeToWorld(Vector3(-3, 100 / 8 + 40, 100 / 8 * 10.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
+	auto obs20 = AddCubeToWorldOBB(Vector3(-3, 100 / 8 + 40, 100 / 8 * 4.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
+	obs21 = AddCubeToWorldOBB(Vector3(-3, 100 / 8 + 35, 100 / 8 * 10.75 + 1), Vector3(100 / 8, 1, 100 / 8), 0);
 	auto obs22 = AddCubeToWorld(Vector3(100 / 8 * 13.5 + 100 / 12, 100 / 12 + 57.5, 100 / 8 * 4.75 + 1), Vector3(1, 100 / 8, 100 / 8), 0);
 }
 
@@ -587,17 +593,20 @@ void TutorialGame::JumpPad2() {
 }
 
 void TutorialGame::AddRotatingBridges() {
-	auto plat1 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
-	auto plat2 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 45, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
-	auto plat3 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 90, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+	plat1 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+	plat2 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 45, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
+	plat3 = AddCubeToWorldOBB(Vector3(100 / 8 * 9.5 + 100 / 12 - 90, 100 / 8 + 38, 100 / 8 * 4.75 + 1), Vector3(20, 1, 10), 0);
 }
 
-void TutorialGame::RotatingBridges() {
-
+void TutorialGame::RotatingBridges(float angle) {
+	Quaternion rotateplat1 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), angle);
+	Quaternion rotateplat3 = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), angle * 1.5);
+	plat1->SetOrientation(rotateplat1);
+	plat3->SetOrientation(rotateplat3);
 }
 
 void TutorialGame::AddRotatingPlatform() {
-	rotatingplat = AddCubeToWorldOBB(Vector3(-25, 100 / 8 + 70, 100 / 8 * 7.75), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
+	rotatingplat = AddCubeToWorldOBB(Vector3(-25, 100 / 8 + 65, 100 / 8 * 7.75), Vector3(100 / 16, 4, 3.5 * 100 / 8), 0);
 	rotatingplat->SetName("Spinner"); //Vector3(0, -14, -100/8 * 3.5); // Vector3(0, -25, -100/8 * 3);
 	rotatingplat2 = AddCubeToWorldOBB((rotatingplat->Position() + Vector3(0, -14, -100 / 8 * 3.5)), Vector3(100 / 16, 10, 2), 0);
 	rotatingplat2->SetName("Support");
@@ -617,11 +626,21 @@ void TutorialGame::RotatingPlatform(float angle) {
 	rotatingplat3->Respawn((rotatingplat->Position() + adjust3));
 }
 
-void TutorialGame::WobblingPlatform() {
+void TutorialGame::AddWobblingPlatform() {
 	Wplat = AddCubeToWorldOBB(Vector3(40, 100 / 8 + 25, 100 / 8 * 10.75 + 1), Vector3(100 / 8 * 3, 1, 100 / 8 * 3), 0);
 	Wplat->SetName("WobblingPlatform");
-	Quaternion rotateWPLAT = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), 0);
-	Wplat->SetOrientation(rotateWPLAT);
+	
+}
+
+void TutorialGame::WobblingPlatform(float angle, std::string dir) {
+	Quaternion rotateWPLATx = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), angle);
+	Quaternion rotateWPLATz = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), angle);
+	if (dir == "x")
+		Wplat->SetOrientation(rotateWPLATx);
+	else if (dir == "z")
+		Wplat->SetOrientation(rotateWPLATz);
+	else
+		return;
 }
 
 void TutorialGame::AddTravelPlatform() {
@@ -655,27 +674,89 @@ void TutorialGame::AddMazePlatform() {
 	mazeplat = AddCubeToWorldOBB(Vector3(36, 100 / 8 + 50, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	mazeplat->SetName("maze");
 	Matrix3 transform = Matrix3(mazeplat->GetTransform().GetOrientation());
-	auto maze1 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 36), 0);
+	maze1 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 36), 0);
 	auto adjust = transform * Vector3(-35, 7, 0);
 	maze1->Respawn(mazeplat->Position() + adjust);
-	auto maze2 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 27), 0);
+	maze2 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(1, 6, 27), 0);
 	auto adjust2 = transform * Vector3(35, 7, -9);
 	maze2->Respawn(mazeplat->Position() + adjust2);
-	auto maze3 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(35, 6, 1), 0);
+	maze3 = AddCubeToWorldOBB(Vector3(0, 0, 0), Vector3(35, 6, 1), 0);
 	auto adjust3 = transform * Vector3(1, 7, 35);
 	maze3->Respawn(mazeplat->Position() + adjust3);
-	auto maze4 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(26, 6, 1), 0);
+	maze4 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(26, 6, 1), 0);
 	auto adjust4 = transform * Vector3(8, 7, -35);
 	maze4->Respawn(mazeplat->Position() + adjust4);
-	auto maze5 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
+	maze5 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
 	auto adjust5 = transform * Vector3(-10.5, 7, -9);
 	maze5->Respawn(mazeplat->Position() + adjust5);
-	auto maze6 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
+	maze6 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
 	auto adjust6 = transform * Vector3(11.5, 7, 9);
 	maze6->Respawn(mazeplat->Position() + adjust6);
-	auto mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, -5, 27)), Vector3(9, 1, 9), 0);
+	mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, -5, 27)), Vector3(9, 1, 9), 0);
 	auto mazeExitWall1 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 36)), Vector3(9, 9, 1), 0);
 	auto mazeExitWall2 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 18)), Vector3(9, 9, 1), 0);
+}
+
+void TutorialGame::mazePlatform(float angle, std::string dir) {
+	Quaternion rotateWPLATx = Quaternion::AxisAngleToQuaterion(Vector3(1, 0, 0), angle);
+	Quaternion rotateWPLATz = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), angle);
+	if (dir == "x") {
+		mazeplat->SetOrientation(rotateWPLATx);
+		Matrix3 transform = Matrix3(mazeplat->GetTransform().GetOrientation());
+		auto adjust = transform * Vector3(-35, 7, 0);
+		maze1->Respawn(mazeplat->Position() + adjust);
+		maze1->SetOrientation(rotateWPLATx);
+		
+		auto adjust2 = transform * Vector3(35, 7, -9);
+		maze2->Respawn(mazeplat->Position() + adjust2);
+		maze2->SetOrientation(rotateWPLATx);
+		
+		auto adjust3 = transform * Vector3(1, 7, 35);
+		maze3->Respawn(mazeplat->Position() + adjust3);
+		maze3->SetOrientation(rotateWPLATx);
+		
+		auto adjust4 = transform * Vector3(8, 7, -35);
+		maze4->Respawn(mazeplat->Position() + adjust4);
+		maze4->SetOrientation(rotateWPLATx);
+		
+		auto adjust5 = transform * Vector3(-10.5, 7, -9);
+		maze5->Respawn(mazeplat->Position() + adjust5);
+		maze5->SetOrientation(rotateWPLATx);
+	
+		auto adjust6 = transform * Vector3(11.5, 7, 9);
+		maze6->Respawn(mazeplat->Position() + adjust6);
+		maze6->SetOrientation(rotateWPLATx);
+	}
+	else if (dir == "z") {
+		mazeplat->SetOrientation(rotateWPLATz);
+		Matrix3 transform = Matrix3(mazeplat->GetTransform().GetOrientation());
+	
+		auto adjust = transform * Vector3(-35, 7, 0);
+		maze1->Respawn(mazeplat->Position() + adjust);
+		maze1->SetOrientation(rotateWPLATz);
+
+		auto adjust2 = transform * Vector3(35, 7, -9);
+		maze2->Respawn(mazeplat->Position() + adjust2);
+		maze2->SetOrientation(rotateWPLATz);
+
+		auto adjust3 = transform * Vector3(1, 7, 35);
+		maze3->Respawn(mazeplat->Position() + adjust3);
+		maze3->SetOrientation(rotateWPLATz);
+	
+		auto adjust4 = transform * Vector3(8, 7, -35);
+		maze4->Respawn(mazeplat->Position() + adjust4);
+		maze4->SetOrientation(rotateWPLATz);
+	
+		auto adjust5 = transform * Vector3(-10.5, 7, -9);
+		maze5->Respawn(mazeplat->Position() + adjust5);
+		maze5->SetOrientation(rotateWPLATz);
+
+		auto adjust6 = transform * Vector3(11.5, 7, 9);
+		maze6->Respawn(mazeplat->Position() + adjust6);
+		maze6->SetOrientation(rotateWPLATz);
+	}
+	else
+		return;
 }
 
 void TutorialGame::AddProjectilePlatform() {
@@ -709,7 +790,7 @@ void TutorialGame::AddBridge() {
 }
 
 void TutorialGame::AddBouncePad() {
-	bounce = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 10, 100 / 8 * 11), Vector3(100 / 8, restinglength, 100 / 8), 0);
+	bounce = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 10, 100 / 8 * 11), Vector3(100 / 8, 1, 100 / 8), 0);
 	bounce->GetPhysicsObject()->spring = true;
 }
 
@@ -898,6 +979,7 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true, selectionObject)) {
 				selectionObject = (GameObject*)closestCollision.node;
+				ActiveObject = selectionObject;
 				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 				
 				Ray objray = selectionObject->CreateRay();
@@ -961,35 +1043,67 @@ void TutorialGame::MoveSelectedObject() {
 	
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
 	 {
-		 stair2->Move(stairlift);
-		 stair4->Move(stairlift);
-		 stair6->Move(stairlift);
-		 stair8->Move(stairlift);
+		 if (ActiveObject == mazeplat) {
+			 mazePlatform(-0.1, "z");
+		 }
+		 else if (ActiveObject == Wplat)
+			 WobblingPlatform(-0.1, "z");
+		 else {
+			 stair2->Move(stairlift);
+			 stair4->Move(stairlift);
+			 stair6->Move(stairlift);
+			 stair8->Move(stairlift);
+		 }
 	 }
 
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN))
 	 {
-		 stair2->Move(-stairlift);
-		 stair4->Move(-stairlift);
-		 stair6->Move(-stairlift);
-		 stair8->Move(-stairlift);
+		 if (ActiveObject == mazeplat)
+			 mazePlatform(0.1, "z");
+		 else if (ActiveObject == Wplat)
+			 WobblingPlatform(0.1, "z");
+		 else {
+			 stair2->Move(-stairlift);
+			 stair4->Move(-stairlift);
+			 stair6->Move(-stairlift);
+			 stair8->Move(-stairlift);
+		 }
 	 }
 
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
-		 RotatingPlatform(1);
-		 TravelPlatform(platLift);
+		 if(ActiveObject == rotatingplat)
+			RotatingPlatform(1);
+		 else if (ActiveObject == liftPlat)
+			TravelPlatform(platLift);
+		 else if (ActiveObject == Wplat) 
+			 WobblingPlatform(0.1, "x");
+		 else if (ActiveObject == mazeplat)
+			 mazePlatform(0.1, "x");
+		 else
+			RotatingBridges(0.1);
 	 }
 
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
-		 RotatingPlatform(-1);
-		 TravelPlatform(-platLift);
+		 if (ActiveObject == rotatingplat)
+			RotatingPlatform(-1);
+		 else if (ActiveObject == liftPlat)
+			TravelPlatform(-platLift);
+		 else if (ActiveObject == Wplat)
+			 WobblingPlatform(-0.1, "x");
+		 else if (ActiveObject == mazeplat)
+			 mazePlatform(-0.1, "x");
+		 else
+			RotatingBridges(-0.1);
 	 }
+
+	 RotatingBridges(-0.1);
 
 	 CollisionDetection::CollisionInfo info1;
 	 if (CollisionDetection::ObjectIntersection(Ball, stair9, info1))
 	 {
-		 SpawnPoint = Checkpoint1;
+		 
 		 std::cout << "Checkpoint Reached\n";
+		 SpawnPoint = Checkpoint1;
 	 }
 	 CollisionDetection::CollisionInfo info2;
 	 if (CollisionDetection::ObjectIntersection(Ball, floora, info2)) {
@@ -1023,28 +1137,45 @@ void TutorialGame::MoveSelectedObject() {
 
 	 CollisionDetection::CollisionInfo info5;
 	 if (CollisionDetection::ObjectIntersection(Ball, rotatingplat3, info5)) {
-		 useGravity = false;
-		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-		 Ball->GetPhysicsObject()->ClearForces();
-		 Matrix3 transform = Matrix3(rotatingplat3->GetTransform().GetOrientation());
-		 auto adjust = transform * Vector3(0, 6, 2);
-		 Ball->Respawn((rotatingplat3->Position() + adjust));
+		 if (hold) {
+			 useGravity = false;
+			 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+			 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+			 Ball->GetPhysicsObject()->ClearForces();
+			 Matrix3 transform = Matrix3(rotatingplat3->GetTransform().GetOrientation());
+			 auto adjust = transform * Vector3(0, 6, 2);
+
+			 Ball->Respawn((rotatingplat3->Position() + adjust));
+		 }
 	 }
 
 	 CollisionDetection::CollisionInfo info6;
-	 if (CollisionDetection::ObjectIntersection(Ball, liftPlat3, info6)) {
-		 
-		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-		 Ball->GetPhysicsObject()->ClearForces();
-		 Matrix3 transform = Matrix3(liftPlat3->GetTransform().GetOrientation());
-		 auto adjust = transform * Vector3(0, -1.25, 10);
-		 Ball->Respawn((liftPlat2->Position() + adjust));
+	 if (CollisionDetection::ObjectIntersection(Ball, obs21, info6)) {
+		 std::cout << "Checkpoint Reached\n";
+		 SpawnPoint = Checkpoint3;
+	 }
+
+	 CollisionDetection::CollisionInfo info7;
+	 if (CollisionDetection::ObjectIntersection(Ball, liftPlat3, info7)) {
+		 if (hold) {
+			 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+			 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+			 Ball->GetPhysicsObject()->ClearForces();
+			 Matrix3 transform = Matrix3(liftPlat3->GetTransform().GetOrientation());
+			 auto adjust = transform * Vector3(0, -1.25, 10);
+			 if (hold)
+				 Ball->Respawn((liftPlat2->Position() + adjust));
+		 }
 	 }
 	
-	 CollisionDetection::CollisionInfo info7;
-	 if (CollisionDetection::ObjectIntersection(Ball, teleport, info7)) {
+	 CollisionDetection::CollisionInfo info8;
+	 if (CollisionDetection::ObjectIntersection(Ball, mazeExit, info8)) {
+		 std::cout << "Checkpoint Reached\n";
+		 SpawnPoint = Checkpoint4;
+	 }
+
+	 CollisionDetection::CollisionInfo info9;
+	 if (CollisionDetection::ObjectIntersection(Ball, teleport, info9)) {
 
 		 useGravity = false;
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
@@ -1057,6 +1188,7 @@ void TutorialGame::MoveSelectedObject() {
 		 Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 		 Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		 Ball->Respawn(gravwell->Position() - Vector3(0, 6, 0));
+		 SpawnPoint = Checkpoint5;
 	 }
 
 	 if (!selectionObject) {
