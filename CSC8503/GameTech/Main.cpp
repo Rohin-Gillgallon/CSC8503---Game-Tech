@@ -121,10 +121,11 @@ int main() {
 		g->UpdateGame(dt);
 
 		//TestStateMachine();
-			
-			DisplayPathfinding();
-		if (Window::GetKeyboard()->KeyDown(KeyboardKeys::P)) {
-		}
+		
+		TestPathfinding();
+		DisplayPathfinding();
+		testNodes.clear();
+		
 	}
 	
 	Window::DestroyGameWindow();
