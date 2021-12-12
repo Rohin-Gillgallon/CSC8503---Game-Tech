@@ -97,6 +97,9 @@ namespace NCL {
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
 			int liftcount = 0;
 			float forceMagnitude;
+			long starttime;
+			long currenttime;
+			int score = 0;
 			Vector3 direction;
 
 			GameObject* ActiveObject = nullptr;

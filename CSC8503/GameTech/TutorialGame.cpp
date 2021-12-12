@@ -7,6 +7,7 @@
 #include "../CSC8503Common/Constraint.h"
 #include "../../Common/Quaternion.h"
 #include "../../Common/Vector3.h"
+#include <time.h>
 
 
 using namespace NCL;
@@ -16,12 +17,12 @@ TutorialGame::TutorialGame()	{
 	world		= new GameWorld();
 	renderer	= new GameTechRenderer(*world);
 	physics		= new PhysicsSystem(*world);
-
+	starttime = time(0);
 	forceMagnitude	= 500.0f;
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	SpawnPoint = Checkpoint1;
+	//SpawnPoint = Checkpoint1;
 	Debug::SetRenderer(renderer);
 	
 	InitialiseAssets();
@@ -85,6 +86,19 @@ void TutorialGame::UpdateGame(float dt) {
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
+
+	if (hold) {
+		Debug::Print("(H)old on", Vector2(5, 90));
+	}
+	else {
+		Debug::Print("(H)old off", Vector2(5, 90));
+	}
+
+	currenttime = time(0) - starttime;
+	renderer->DrawString("Time:" + std::to_string(currenttime),
+		Vector2(5, 10));//Draw debug text at 10,20
+
+	renderer->DrawString("Score:" + std::to_string(score), Vector2(80, 10));
 
 	SelectObject();
 	MoveSelectedObject();
@@ -1041,6 +1055,8 @@ void TutorialGame::MoveSelectedObject() {
 	
 	 forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 	
+
+
 	 if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
 	 {
 		 if (ActiveObject == mazeplat) {
