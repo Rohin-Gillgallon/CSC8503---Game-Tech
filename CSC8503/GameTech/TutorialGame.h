@@ -3,9 +3,17 @@
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "StateGameObject.h"
 
-
-
 namespace NCL {
+
+	enum class GameState {
+		Title = 0,
+		Menu = 1,
+		Level1 = 2,
+		Level1Score = 3,
+		Level2 = 4,
+		Level2Score = 5
+	};
+
 	namespace CSC8503 {
 		class TutorialGame		{
 		public:
@@ -15,6 +23,9 @@ namespace NCL {
 			virtual void UpdateGame(float dt);
 
 		protected:
+
+			GameState state;
+
 			void InitialiseAssets();
 
 			void InitCamera();
@@ -73,13 +84,16 @@ namespace NCL {
 			void AddIcePatch();
 			void AddTeleport();
 			void AddGoal();
+			void AddBonuses();
 
-			Vector3 SpawnPoint = Vector3(-40, 10, -40);
+			Vector3 SpawnPoint = Vector3(-100 / 8 * 3, 10, -100 / 8 * 3);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
 			Vector3 Checkpoint2 = Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1);
 			Vector3 Checkpoint3 = Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1);
 			Vector3 Checkpoint4 = Vector3(81, 100/8+55, 100/8*19+27);
 			Vector3 Checkpoint5 = Vector3(201 - 100 / 8 * 3, 100 / 8 + 80, 100 / 8 * 19.5);
+			Vector4 colour;
+			Vector4 colour2;
 
 			bool useGravity;
 			bool inSelectionMode;
@@ -143,6 +157,7 @@ namespace NCL {
 			GameObject* teleport;
 			GameObject* goal;
 			
+			vector<GameObject*> bonuses;
 
 			OGLMesh*	capsuleMesh = nullptr;
 			OGLMesh*	cubeMesh	= nullptr;
