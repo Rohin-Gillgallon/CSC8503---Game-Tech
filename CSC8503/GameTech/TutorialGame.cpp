@@ -95,11 +95,19 @@ void TutorialGame::UpdateGame(float dt) {
 		Debug::Print("(G)ravity off", Vector2(5, 95));
 	}
 
-	if (hold) {
-		Debug::Print("(H)old on", Vector2(5, 90));
+	if (state == GameState::Level1) {
+		if (hold) {
+			Debug::Print("(H)old on", Vector2(5, 90));
+		}
+		else {
+			Debug::Print("(H)old off", Vector2(5, 90));
+		}
 	}
-	else {
-		Debug::Print("(H)old off", Vector2(5, 90));
+
+	if (state == GameState::Level2) {
+		if (testStateObject) {
+			//testStateObject->Update(dt);
+		}
 	}
 
 	currenttime = time(0) - starttime;
@@ -333,8 +341,18 @@ void TutorialGame::InitWorld() {
 	}
 	if (state == GameState::Level2) {
 		Addmazefloor();
-		//AddWalls();
+		testStateObject = AddStateObjectToWorld(Vector3(10, 5 ,10), 5.0f, 2.0f);
+		testStateObject2 = AddStateObjectToWorld(Vector3(200, 5, 200), 5.0f, 2.0f);
+		
 	}
+}
+
+Vector3 TutorialGame::Seek(Vector3 target, Vector3 seeker, Vector3 velocity) const {
+	Vector3 desired = target - seeker;
+	float speed = 5;
+	Vector3 d = desired / desired.Length() * speed;
+	Vector3 steering = d - velocity;
+	return steering;
 }
 
 void TutorialGame::Addmazefloor() {
@@ -1042,6 +1060,27 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	return apple;
 }
 
+StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, float radius, float inverseMass) {
+	StateGameObject* sphere = new StateGameObject();
+
+	Vector3 sphereSize = Vector3(radius, radius, radius);
+	SphereVolume* volume = new SphereVolume(radius);
+	sphere->SetBoundingVolume((CollisionVolume*)volume);
+
+	sphere->GetTransform()
+		.SetScale(sphereSize)
+		.SetPosition(position);
+
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader));
+	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
+
+	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
+	sphere->GetPhysicsObject()->InitSphereInertia();
+	world->AddGameObject(sphere);
+
+	return sphere;
+}
+
 /*
 
 Every frame, this code will let you perform a raycast, to see if there's an object
@@ -1319,6 +1358,13 @@ void TutorialGame::MoveSelectedObject() {
 			bonuses[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 0.3));
 		}
 	}
+
+	if (state == GameState::Level2) {
+		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
+		force = Seek(testStateObject->Position(), testStateObject2->Position(), velocity);
+		testStateObject2->GetPhysicsObject()->AddForce(force);
+	}
+
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
 	 }		

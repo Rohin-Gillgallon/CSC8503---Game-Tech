@@ -56,5 +56,14 @@
  void StateGameObject::MoveRight(float dt) {
 	 GetPhysicsObject()->AddForce({ 1, 0, 0 });
 	 counter -= dt;
+ }
 
+ void StateGameObject::Seek(GameObject target, GameObject seeker) {
+	 Vector3 pos = seeker.Position();
+	 Vector3 targetpos = target.Position();
+	 Vector3 desired = targetpos - pos;
+	 float speed = 5;
+	 Vector3 d = desired / desired.Length() * speed;
+	 Vector3 steering = d - seeker.GetPhysicsObject()->GetLinearVelocity();
+	 seeker.GetPhysicsObject()->AddForce(steering);
  }

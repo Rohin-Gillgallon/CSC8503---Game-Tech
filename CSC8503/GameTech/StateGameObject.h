@@ -13,7 +13,7 @@ namespace NCL {
 		protected:
 			void MoveLeft(float dt);
 			void MoveRight(float dt);
-
+			void Seek(GameObject target, GameObject seeker);
 			StateMachine* stateMachine;
 			float counter;
 		};

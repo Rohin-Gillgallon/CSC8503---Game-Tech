@@ -78,7 +78,9 @@ namespace NCL {
 				}
 			}
 
-
+			Vector3 Seek(Vector3 target, Vector3 seeker, Vector3 velocity) const;
+			Vector3 velocity;
+			Vector3 force;
 
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddMazeFloorToWorld(const Vector3& position);
@@ -92,8 +94,9 @@ namespace NCL {
 			GameObject* AddEnemyToWorld(const Vector3& position);
 			GameObject* AddBonusToWorld(const Vector3& position);
 
-			StateGameObject* AddStateObjectToWorld(const Vector3& position);
+			StateGameObject* AddStateObjectToWorld(const Vector3& position, float radius, float inverseMass);
 			StateGameObject* testStateObject;
+			StateGameObject* testStateObject2;
 
 			GameTechRenderer*	renderer;
 			PhysicsSystem*		physics;
