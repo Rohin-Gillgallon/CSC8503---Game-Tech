@@ -332,8 +332,8 @@ void TutorialGame::InitWorld() {
 }
 
 void TutorialGame::Addmazefloor() {
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
+	for (int i = 0; i < 8; i++) {
+		for (int j = 0; j < 8; j++) {
 			AddMazeFloorToWorld(Vector3(20 + i * 40, -5, 20 + j * 40));
 		}
 	}
@@ -405,7 +405,7 @@ GameObject* TutorialGame::AddMazeFloorToWorld(const Vector3& position) {
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
 		.SetScale(floorSize)
-		.SetPosition(position);
+		.SetPosition(position - Vector3(10, 0, 10));
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
