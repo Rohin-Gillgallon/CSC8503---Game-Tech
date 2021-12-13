@@ -37,6 +37,9 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 			infile >> type;
 			n.type = type;
 			n.position = Vector3((float)(x * nodeSize), 0, (float)(y * nodeSize));
+			if (n.type == 120) {
+				walls.push_back(n.position);
+			}
 		}
 	}
 	

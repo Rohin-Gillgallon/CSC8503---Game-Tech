@@ -2,6 +2,7 @@
 #include "GameTechRenderer.h"
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "StateGameObject.h"
+#include "../CSC8503Common/NavigationGrid.h"
 
 namespace NCL {
 
@@ -46,6 +47,39 @@ namespace NCL {
 			void DebugObjectMovement();
 			void LockedObjectMovement();
 
+
+
+			vector <Vector3 > testNodes;
+			std::vector<Vector3> walls;
+
+			void TestPathfinding() {
+				NavigationGrid grid("TestGrid1.txt");
+				walls = grid.GetWalls();
+				NavigationPath outPath;
+
+				Vector3 startPos(10, 0, 10);
+				Vector3 endPos(290, 0, 290);
+
+				bool found = grid.FindPath(startPos, endPos, outPath);
+
+				Vector3 pos;
+				while (outPath.PopWaypoint(pos)) {
+					testNodes.push_back(pos);
+				}
+
+			}
+
+			void DisplayPathfinding() {
+				for (int i = 1; i < testNodes.size(); ++i) {
+					Vector3 a = testNodes[i - 1];
+					Vector3 b = testNodes[i];
+
+					Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
+				}
+			}
+
+
+
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddMazeFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
@@ -88,6 +122,7 @@ namespace NCL {
 			void AddBonuses();
 
 			void Addmazefloor();
+			void AddWalls();
 
 			Vector3 SpawnPoint = Vector3(-100 / 8 * 3, 10, -100 / 8 * 3);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);

@@ -128,9 +128,6 @@ int main() {
 
 		//TestStateMachine();
 		
-		TestPathfinding();
-		DisplayPathfinding();
-		testNodes.clear();
 		
 		/*next = maze.checkNeighbours(current);
 		if (stack.size() <= 0) {

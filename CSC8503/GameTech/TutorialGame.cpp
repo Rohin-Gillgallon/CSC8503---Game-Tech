@@ -7,6 +7,7 @@
 #include "../CSC8503Common/Constraint.h"
 #include "../../Common/Quaternion.h"
 #include "../../Common/Vector3.h"
+#include "../CSC8503Common/NavigationGrid.h"
 #include <time.h>
 
 
@@ -80,6 +81,10 @@ void TutorialGame::UpdateGame(float dt) {
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
+
+	TestPathfinding();
+	DisplayPathfinding();
+	testNodes.clear();
 
 	UpdateKeys();
 
@@ -328,6 +333,7 @@ void TutorialGame::InitWorld() {
 	}
 	if (state == GameState::Level2) {
 		Addmazefloor();
+		//AddWalls();
 	}
 }
 
@@ -338,6 +344,13 @@ void TutorialGame::Addmazefloor() {
 		}
 	}
 	
+}
+
+void TutorialGame::AddWalls() {
+	TestPathfinding();
+	for (int i = 0; i < walls.size(); i++) {
+		AddCubeToWorld(walls[i], Vector3(5, 5, 5), 0);
+	}
 }
 
 void TutorialGame::BridgeConstraintTest() {
