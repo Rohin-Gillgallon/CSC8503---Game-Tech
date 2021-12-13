@@ -102,6 +102,12 @@
     <ClInclude Include="Constraint.h">
       <Filter>CollisionDetection</Filter>
     </ClInclude>
+    <ClInclude Include="Cell.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Grid.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -148,6 +154,12 @@
     </ClCompile>
     <ClCompile Include="QuadTree.cpp">
       <Filter>CollisionDetection</Filter>
+    </ClCompile>
+    <ClCompile Include="Cell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Grid.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

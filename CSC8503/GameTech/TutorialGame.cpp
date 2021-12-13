@@ -22,9 +22,9 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	//SpawnPoint = Checkpoint1;
+	//SpawnPoint = Checkpoint4;
 	Debug::SetRenderer(renderer);
-	state = GameState::Level1;
+	state = GameState::Level2;
 	InitialiseAssets();
 }
 
@@ -303,8 +303,8 @@ void TutorialGame::InitWorld() {
 
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 	//InitGameExamples();
-	InitDefaultFloor();
 	if (state == GameState::Level1) {
+		InitDefaultFloor();
 		InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
 		InitAddObstacles();
 		Stairs();
@@ -326,10 +326,22 @@ void TutorialGame::InitWorld() {
 		AddBonuses();
 		score = 0;
 	}
+	if (state == GameState::Level2) {
+		Addmazefloor();
+	}
+}
+
+void TutorialGame::Addmazefloor() {
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			AddMazeFloorToWorld(Vector3(20 + i * 40, -5, 20 + j * 40));
+		}
+	}
+	
 }
 
 void TutorialGame::BridgeConstraintTest() {
-	Vector3 cubeSize = Vector3(1, 1, 1);
+	Vector3 cubeSize = Vector3(1.2, 1.2, 1.2);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
 	int numLinks = 6;
@@ -371,6 +383,28 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
 		.SetScale(floorSize * 2)
+		.SetPosition(position);
+
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+
+	floor->GetPhysicsObject()->SetInverseMass(0);
+	floor->GetPhysicsObject()->InitCubeInertia();
+
+	world->AddGameObject(floor);
+	floor->SetName("floor");
+	floor->GetRenderObject()->SetColour(Vector4(1, 0, 1, 1));
+	return floor;
+}
+
+GameObject* TutorialGame::AddMazeFloorToWorld(const Vector3& position) {
+	GameObject* floor = new GameObject();
+
+	Vector3 floorSize = Vector3(40, 2, 40);
+	AABBVolume* volume = new AABBVolume(floorSize);
+	floor->SetBoundingVolume((CollisionVolume*)volume);
+	floor->GetTransform()
+		.SetScale(floorSize)
 		.SetPosition(position);
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
@@ -714,9 +748,9 @@ void TutorialGame::AddMazePlatform() {
 	maze6 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
 	auto adjust6 = transform * Vector3(11.5, 7, 9);
 	maze6->Respawn(mazeplat->Position() + adjust6);
-	mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, -5, 27)), Vector3(9, 1, 9), 0);
-	auto mazeExitWall1 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 36)), Vector3(9, 9, 1), 0);
-	auto mazeExitWall2 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45, 5, 18)), Vector3(9, 9, 1), 0);
+	mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, -5, 27)), Vector3(9, 1, 9), 0);
+	auto mazeExitWall1 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, 5, 36)), Vector3(9, 9, 1), 0);
+	auto mazeExitWall2 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, 5, 18)), Vector3(9, 9, 1), 0);
 }
 
 void TutorialGame::mazePlatform(float angle, std::string dir) {
@@ -782,7 +816,7 @@ void TutorialGame::mazePlatform(float angle, std::string dir) {
 }
 
 void TutorialGame::AddProjectilePlatform() {
-	auto Projplat = AddCubeToWorldOBB(Vector3(124, 100 / 8 + 60, 100 / 8 * 19), Vector3(36, 1, 36), 0);
+	auto Projplat = AddCubeToWorldOBB(Vector3(123, 100 / 8 + 60, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Projplat->SetOrientation(rotateproj);
 	auto projplatbase = AddCubeToWorldOBB(Vector3(100, 100 / 8 + 60, 100 / 8 * 18.25), Vector3(1, 9, 27), 0);

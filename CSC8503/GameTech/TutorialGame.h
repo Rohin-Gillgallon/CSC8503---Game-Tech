@@ -47,6 +47,7 @@ namespace NCL {
 			void LockedObjectMovement();
 
 			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddMazeFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorldOBB(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
@@ -85,6 +86,8 @@ namespace NCL {
 			void AddTeleport();
 			void AddGoal();
 			void AddBonuses();
+
+			void Addmazefloor();
 
 			Vector3 SpawnPoint = Vector3(-100 / 8 * 3, 10, -100 / 8 * 3);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);

@@ -5,7 +5,7 @@
 #include "../CSC8503Common/State.h"
 
 #include "../CSC8503Common/NavigationGrid.h"
-
+#include "../CSC8503Common/Grid.h"
 #include "TutorialGame.h"
 
 using namespace NCL;
@@ -79,6 +79,8 @@ void TestPathfinding() {
 	 }
  }
 
+
+
 /*
 
 The main function should look pretty familar to you!
@@ -93,7 +95,11 @@ hide or show the
 */
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
-	TestPathfinding();
+	/*Grid maze;
+	maze.Build();
+	auto stack = maze.stack;
+	auto current = maze.grid[0];
+	auto next = maze.checkNeighbours(current);*/
 	if (!w->HasInitialised()) {
 		return -1;
 	}	
@@ -126,6 +132,17 @@ int main() {
 		DisplayPathfinding();
 		testNodes.clear();
 		
+		/*next = maze.checkNeighbours(current);
+		if (stack.size() <= 0) {
+			maze.visited[maze.index(next.c, next.d)] = true;
+			stack.push_back(current);
+			maze.removeWalls(current, next);
+			current = next;
+		}
+		else {
+			current = stack[stack.size() - 1];
+			stack.pop_back();
+		}*/
 	}
 	
 	Window::DestroyGameWindow();

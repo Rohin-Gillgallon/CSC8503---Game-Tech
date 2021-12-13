@@ -134,6 +134,8 @@
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />
     <ClInclude Include="CapsuleVolume.h" />
+    <ClInclude Include="Cell.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="NavigationGrid.h" />
     <ClInclude Include="NavigationMap.h" />
     <ClInclude Include="NavigationMesh.h" />
@@ -159,10 +161,12 @@
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameWorld.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="NavigationGrid.cpp" />
     <ClCompile Include="NavigationMesh.cpp" />
     <ClCompile Include="PhysicsObject.cpp" />
