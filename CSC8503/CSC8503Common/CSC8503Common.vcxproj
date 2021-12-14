@@ -133,6 +133,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AABBVolume.h" />
+    <ClInclude Include="BehaviourAction.h" />
+    <ClInclude Include="BehaviourNode.h" />
+    <ClInclude Include="BehaviourNodeWithChildren.h" />
+    <ClInclude Include="BehaviourSequence.h" />
     <ClInclude Include="CapsuleVolume.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="Grid.h" />
@@ -161,6 +165,7 @@
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BehaviourSelector.h" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="CollisionDetection.cpp" />
     <ClCompile Include="Debug.cpp" />

@@ -108,6 +108,18 @@
     <ClInclude Include="Grid.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="BehaviourNode.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviourNodeWithChildren.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviourSequence.h">
+      <Filter>AI</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviourAction.h">
+      <Filter>AI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameWorld.cpp">
@@ -160,6 +172,9 @@
     </ClCompile>
     <ClCompile Include="Grid.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviourSelector.h">
+      <Filter>AI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

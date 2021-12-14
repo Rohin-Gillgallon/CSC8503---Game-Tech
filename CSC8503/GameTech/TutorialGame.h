@@ -22,6 +22,8 @@ namespace NCL {
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
+			int count;
+			int start;
 
 		protected:
 
@@ -52,12 +54,12 @@ namespace NCL {
 			vector <Vector3 > testNodes;
 			std::vector<Vector3> walls;
 
-			void TestPathfinding() {
+			void TestPathfinding(Vector3 target) {
 				NavigationGrid grid("TestGrid1.txt");
 				walls = grid.GetWalls();
 				NavigationPath outPath;
 
-				Vector3 startPos(10, 0, 10);
+				Vector3 startPos = target; // (10, 0, 10);
 				Vector3 endPos(290, 0, 290);
 
 				bool found = grid.FindPath(startPos, endPos, outPath);
@@ -66,7 +68,7 @@ namespace NCL {
 				while (outPath.PopWaypoint(pos)) {
 					testNodes.push_back(pos);
 				}
-
+				start = testNodes.size();
 			}
 
 			void DisplayPathfinding() {
@@ -78,10 +80,9 @@ namespace NCL {
 				}
 			}
 
-			Vector3 Seek(Vector3 target, Vector3 seeker, Vector3 velocity) const;
+			Vector3 Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start);
 			Vector3 velocity;
 			Vector3 force;
-
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddMazeFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);

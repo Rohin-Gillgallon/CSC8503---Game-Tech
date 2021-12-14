@@ -27,6 +27,7 @@ TutorialGame::TutorialGame()	{
 	Debug::SetRenderer(renderer);
 	state = GameState::Level2;
 	InitialiseAssets();
+	count = 1;
 }
 
 /*
@@ -82,9 +83,14 @@ void TutorialGame::UpdateGame(float dt) {
 		world->GetMainCamera()->UpdateCamera(dt);
 	}
 
-	TestPathfinding();
-	DisplayPathfinding();
-	testNodes.clear();
+	if (state == GameState::Level2) {
+		TestPathfinding(testStateObject->Position());
+		DisplayPathfinding();
+		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
+		force = Seek(testNodes, testStateObject2->Position(), velocity, start);
+		testStateObject2->GetPhysicsObject()->AddForce(force);
+		testNodes.clear();
+	}
 
 	UpdateKeys();
 
@@ -341,18 +347,27 @@ void TutorialGame::InitWorld() {
 	}
 	if (state == GameState::Level2) {
 		Addmazefloor();
-		testStateObject = AddStateObjectToWorld(Vector3(10, 5 ,10), 5.0f, 2.0f);
-		testStateObject2 = AddStateObjectToWorld(Vector3(200, 5, 200), 5.0f, 2.0f);
+		testStateObject = AddStateObjectToWorld(Vector3(10, 5 ,10), 2.5f, 1.0f);
+		testStateObject2 = AddStateObjectToWorld(Vector3(290, 5, 290), 2.5f, 1.0f);
+		AddWalls();
 		
 	}
 }
 
-Vector3 TutorialGame::Seek(Vector3 target, Vector3 seeker, Vector3 velocity) const {
-	Vector3 desired = target - seeker;
-	float speed = 5;
-	Vector3 d = desired / desired.Length() * speed;
-	Vector3 steering = d - velocity;
-	return steering;
+Vector3 TutorialGame::Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start)  {
+	if (start - count > 0) {
+		Vector3 desired = target[start - count] - seeker;
+		auto l = desired.Length();
+		if (desired.Length() < 2) {
+			count++;
+		}
+		float speed = 10;
+		Vector3 d = desired / desired.Length() * speed;
+		Vector3 steering = d - velocity;
+		return steering;
+	}
+	else
+		return Vector3(0, 0, 0);
 }
 
 void TutorialGame::Addmazefloor() {
@@ -365,7 +380,7 @@ void TutorialGame::Addmazefloor() {
 }
 
 void TutorialGame::AddWalls() {
-	TestPathfinding();
+	TestPathfinding(testStateObject->Position());
 	for (int i = 0; i < walls.size(); i++) {
 		AddCubeToWorld(walls[i], Vector3(5, 5, 5), 0);
 	}
@@ -431,11 +446,11 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position) {
 GameObject* TutorialGame::AddMazeFloorToWorld(const Vector3& position) {
 	GameObject* floor = new GameObject();
 
-	Vector3 floorSize = Vector3(40, 2, 40);
+	Vector3 floorSize = Vector3(20, 2, 20);
 	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
-		.SetScale(floorSize)
+		.SetScale(floorSize * 2)
 		.SetPosition(position - Vector3(10, 0, 10));
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
@@ -1266,7 +1281,7 @@ void TutorialGame::MoveSelectedObject() {
 			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 			useGravity = true;
-			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 4250, Vector3(200.149, 12.2566, -2.58092));
+			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3000, Vector3(200.149, 12.2566, -2.58092));
 		}
 
 		CollisionDetection::CollisionInfo info3;
@@ -1359,11 +1374,11 @@ void TutorialGame::MoveSelectedObject() {
 		}
 	}
 
-	if (state == GameState::Level2) {
+	/*if (state == GameState::Level2) {
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
 		force = Seek(testStateObject->Position(), testStateObject2->Position(), velocity);
 		testStateObject2->GetPhysicsObject()->AddForce(force);
-	}
+	}*/
 
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!
