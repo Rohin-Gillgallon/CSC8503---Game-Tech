@@ -349,7 +349,7 @@ void TutorialGame::InitWorld() {
 		Addmazefloor();
 		testStateObject = AddStateObjectToWorld(Vector3(10, 5 ,10), 2.5f, 1.0f);
 		testStateObject2 = AddStateObjectToWorld(Vector3(290, 5, 290), 2.5f, 1.0f);
-		AddWalls();
+		//AddWalls();
 		
 	}
 }
@@ -1281,7 +1281,7 @@ void TutorialGame::MoveSelectedObject() {
 			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 			useGravity = true;
-			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3000, Vector3(200.149, 12.2566, -2.58092));
+			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 2750, Vector3(200.149, 12.2566, -2.58092));
 		}
 
 		CollisionDetection::CollisionInfo info3;
