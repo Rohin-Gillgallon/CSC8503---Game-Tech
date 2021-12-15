@@ -1379,6 +1379,9 @@ void TutorialGame::MoveSelectedObject() {
 				stair8->Move(stairlift);
 			}
 		}
+		if (state == GameState::Level2) {
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude);
+		}
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::DOWN))
@@ -1395,6 +1398,9 @@ void TutorialGame::MoveSelectedObject() {
 				stair8->Move(-stairlift);
 			}
 		}
+		if (state == GameState::Level2) {
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude);
+		}
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::RIGHT)) {
@@ -1410,6 +1416,9 @@ void TutorialGame::MoveSelectedObject() {
 			else
 				RotatingBridges(0.1);
 		}
+		if (state == GameState::Level2) {
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude);
+		}
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::LEFT)) {
@@ -1424,6 +1433,9 @@ void TutorialGame::MoveSelectedObject() {
 				mazePlatform(-0.1, "x");
 			else
 				RotatingBridges(-0.1);
+		}
+		if (state == GameState::Level2) {
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude);
 		}
 	}
 
