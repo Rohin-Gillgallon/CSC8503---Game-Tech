@@ -40,6 +40,9 @@ NavigationGrid::NavigationGrid(const std::string&filename) : NavigationGrid() {
 			if (n.type == 120) {
 				walls.push_back(n.position);
 			}
+			else if (n.type == 46) {
+				route.push_back(n.position);
+			}
 		}
 	}
 	

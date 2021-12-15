@@ -29,6 +29,14 @@ namespace NCL {
 				return isActive;
 			}
 
+			bool GetCollision() const {
+				return collision;
+			}
+
+			void setCollsion(bool active) {
+				collision = active;
+			}
+
 			Ray CreateRay() {
 				GameObject* obj = this;
 				return Ray(Position(), Forward());
@@ -114,7 +122,7 @@ namespace NCL {
 			CollisionVolume*	boundingVolume;
 			PhysicsObject*		physicsObject;
 			RenderObject*		renderObject;
-
+			bool	collision;
 			bool	isActive;
 			int		worldID;
 			string	name;

@@ -13,12 +13,14 @@
 
 	 State* stateA = new State([&](float dt)-> void
 		 {
-			 this->MoveLeft(dt);
+			 this->Seek(dt, state1force);
+			 std::cout << "I am seeking" << std::endl;
 		 }
 	 );
 	 State* stateB = new State([&](float dt)-> void
 		 {
-			 this->MoveRight(dt);
+			 this->Flee(dt, state2force);
+			 std::cout << "I am fleeing" << std::endl;
 		 }
 	 );
 
@@ -44,8 +46,10 @@
 	 delete stateMachine;
  }
  
- void StateGameObject::Update(float dt) {
+ void StateGameObject::Update(float dt, Vector3 force1, Vector3 force2) {
 	 stateMachine->Update(dt);
+	 state1force = force1;
+	 state2force = force2;
  }
 
  void StateGameObject::MoveLeft(float dt) {
@@ -58,12 +62,13 @@
 	 counter -= dt;
  }
 
- void StateGameObject::Seek(GameObject target, GameObject seeker) {
-	 Vector3 pos = seeker.Position();
-	 Vector3 targetpos = target.Position();
-	 Vector3 desired = targetpos - pos;
-	 float speed = 5;
-	 Vector3 d = desired / desired.Length() * speed;
-	 Vector3 steering = d - seeker.GetPhysicsObject()->GetLinearVelocity();
-	 seeker.GetPhysicsObject()->AddForce(steering);
+ void StateGameObject::Seek(float dt, Vector3 force) {
+	 GetPhysicsObject()->AddForce(force);
+	 counter += dt;
  }
+
+ void StateGameObject::Flee(float dt, Vector3 force) {
+	 GetPhysicsObject()->AddForce(force / 10);
+	 counter -= dt;
+ }
+ 

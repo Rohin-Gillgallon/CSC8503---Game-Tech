@@ -84,12 +84,14 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::Level2) {
-		TestPathfinding(testStateObject->Position());
+		TestPathfinding(testStateObject->Position(), seekNodes);
 		DisplayPathfinding();
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
-		force = Seek(testNodes, testStateObject2->Position(), velocity, start);
-		testStateObject2->GetPhysicsObject()->AddForce(force);
-		testNodes.clear();
+		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
+		//fleeforce = Flee(seekNodes, testStateObject2->Position(), velocity, start);
+		//testStateObject2->Update(dt, seekforce, fleeforce);
+		testStateObject2->GetPhysicsObject()->AddForce(seekforce);
+		seekNodes.clear();
 	}
 
 	UpdateKeys();
@@ -111,9 +113,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::Level2) {
-		if (testStateObject) {
-			//testStateObject->Update(dt);
-		}
+		
 	}
 
 	currenttime = time(0) - starttime;
@@ -347,22 +347,41 @@ void TutorialGame::InitWorld() {
 	}
 	if (state == GameState::Level2) {
 		Addmazefloor();
-		testStateObject = AddStateObjectToWorld(Vector3(10, 5 ,10), 2.5f, 1.0f);
-		testStateObject2 = AddStateObjectToWorld(Vector3(290, 5, 290), 2.5f, 1.0f);
-		//AddWalls();
+		testStateObject = AddStateObjectToWorld(Vector3(10, -2.5, 10), 2.5f, 0.1f);
+		testStateObject2 = AddStateObjectToWorld(Vector3(290, -2.5, 290), 2.5f, 0.1f);
+		AddWalls();
 		
 	}
 }
 
 Vector3 TutorialGame::Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start)  {
 	if (start - count > 0) {
+		current = start - count;
 		Vector3 desired = target[start - count] - seeker;
 		auto l = desired.Length();
+		float speed = 30;
+		Vector3 d = desired / desired.Length() * speed;
 		if (desired.Length() < 2) {
 			count++;
+			d = (d / 2 - desired);
 		}
-		float speed = 10;
+		Vector3 steering = d - velocity;
+		return steering;
+	}
+	else
+		return Vector3(0, 0, 0);
+}
+
+Vector3 TutorialGame::Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start) {
+	if (current < target.size() - 5) {
+		Vector3 desired = target[current + 1] - seeker;
+		auto l = desired.Length();
+		float speed = 30;
 		Vector3 d = desired / desired.Length() * speed;
+		if (desired.Length() < 2) {
+			count--;
+			d = (d / 2) * speed;
+		}
 		Vector3 steering = d - velocity;
 		return steering;
 	}
@@ -380,9 +399,10 @@ void TutorialGame::Addmazefloor() {
 }
 
 void TutorialGame::AddWalls() {
-	TestPathfinding(testStateObject->Position());
+	TestPathfinding(testStateObject->Position(), seekNodes);
 	for (int i = 0; i < walls.size(); i++) {
-		AddCubeToWorld(walls[i], Vector3(5, 5, 5), 0);
+		AddCubeToWorld(walls[i] + Vector3(0, 2, 0), Vector3(5, 5, 5), 0, false);
+		
 	}
 }
 
@@ -455,7 +475,7 @@ GameObject* TutorialGame::AddMazeFloorToWorld(const Vector3& position) {
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
-
+	floor->setCollsion(false);
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
 
@@ -516,13 +536,13 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 
 }
 
-GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass) {
+GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass, bool active) {
 	GameObject* cube = new GameObject();
 
 	AABBVolume* volume = new AABBVolume(dimensions);
 
 	cube->SetBoundingVolume((CollisionVolume*)volume);
-
+	cube->setCollsion(active);
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2);

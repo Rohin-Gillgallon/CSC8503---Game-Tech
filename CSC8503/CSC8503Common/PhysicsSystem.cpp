@@ -21,7 +21,7 @@ and the forces that are added to objects to change those positions
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
 	applyGravity	= false;
-	useBroadPhase	= true;	
+	useBroadPhase	= false;	
 	dTOffset		= 0.0f;
 	globalDamping	= 0.2f;
 	SetGravity(Vector3(0.0f, -4 * 9.8f, 0.0f));
@@ -202,11 +202,15 @@ void PhysicsSystem::BasicCollisionDetection() {
 	gameWorld.GetObjectIterators(first, last);
 	
 	for (auto i = first; i != last; ++i) {
+		
 		if ((*i)->GetPhysicsObject() == nullptr) {
 			continue;
 		}
 		for (auto j = i + 1; j != last; ++j) {
 			if ((*j)->GetPhysicsObject() == nullptr) {
+				continue;
+			}
+			if ((*i)->GetCollision() == false && (*j)->GetCollision() == false) {
 				continue;
 			}
 			CollisionDetection::CollisionInfo info;
@@ -287,7 +291,7 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 	float angularEffect = Vector3::Dot(inertiaA + inertiaB, p.normal);
 	float angularEffectT = Vector3::Dot(inertiaA + inertiaB, UnitTangent);
 	
-	float cRestitution = 0.6f; // disperse some kinectic energy
+	float cRestitution = 0.45f; // disperse some kinectic energy
 	float coeffFriction = physA->GetFriction() * physB->GetFriction();
 	
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
@@ -352,7 +356,7 @@ compare the collisions that we absolutely need to.
 
 void PhysicsSystem::BroadPhase() {
 	broadphaseCollisions.clear();
-	QuadTree <GameObject*> tree(Vector2(1024, 1024), 7, 6);
+	QuadTree <GameObject*> tree(Vector2(1024, 1024), 14, 12);
 	
 	std::vector <GameObject*>::const_iterator first;
 	std::vector <GameObject*>::const_iterator last;

@@ -343,7 +343,7 @@ int main() {
 		
 		//TestBehaviourTree();
 		
-		TestPushdownAutomata(w);
+		//TestPushdownAutomata(w);
 
 		/*next = maze.checkNeighbours(current);
 		if (stack.size() <= 0) {

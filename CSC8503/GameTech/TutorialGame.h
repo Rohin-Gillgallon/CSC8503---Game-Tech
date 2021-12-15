@@ -24,6 +24,7 @@ namespace NCL {
 			virtual void UpdateGame(float dt);
 			int count;
 			int start;
+			int current;
 
 		protected:
 
@@ -51,10 +52,10 @@ namespace NCL {
 
 
 
-			vector <Vector3 > testNodes;
+			vector <Vector3 > seekNodes;
 			std::vector<Vector3> walls;
 
-			void TestPathfinding(Vector3 target) {
+			void TestPathfinding(Vector3 target, vector<Vector3> &testNodes) {
 				NavigationGrid grid("TestGrid1.txt");
 				walls = grid.GetWalls();
 				NavigationPath outPath;
@@ -72,21 +73,23 @@ namespace NCL {
 			}
 
 			void DisplayPathfinding() {
-				for (int i = 1; i < testNodes.size(); ++i) {
-					Vector3 a = testNodes[i - 1];
-					Vector3 b = testNodes[i];
+				for (int i = 1; i < seekNodes.size(); ++i) {
+					Vector3 a = seekNodes[i - 1];
+					Vector3 b = seekNodes[i];
 
 					Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
 				}
 			}
 
 			Vector3 Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start);
+			Vector3 Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start);
 			Vector3 velocity;
-			Vector3 force;
+			Vector3 seekforce;
+			Vector3 fleeforce;
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddMazeFloorToWorld(const Vector3& position);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
-			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
+			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f, bool active = true);
 			GameObject* AddCubeToWorldOBB(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
 			
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);

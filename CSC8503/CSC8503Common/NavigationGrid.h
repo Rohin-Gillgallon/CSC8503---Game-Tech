@@ -39,6 +39,9 @@ namespace NCL {
 			std::vector<Vector3> GetWalls() {
 				return walls;
 			}
+			std::vector<Vector3> GetRoute() {
+				return route;
+			}
 		protected:
 			bool		NodeInList(GridNode* n, std::vector<GridNode*>& list) const;
 			GridNode*	RemoveBestNode(std::vector<GridNode*>& list) const;
@@ -47,6 +50,7 @@ namespace NCL {
 			int gridWidth;
 			int gridHeight;
 			std::vector<Vector3> walls;
+			std::vector<Vector3> route;
 			GridNode* allNodes;
 		};
 	}
