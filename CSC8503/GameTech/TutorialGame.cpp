@@ -90,7 +90,7 @@ void TutorialGame::UpdateGame(float dt) {
 		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
 		//fleeforce = Flee(seekNodes, testStateObject2->Position(), velocity, start);
 		//testStateObject2->Update(dt, seekforce, fleeforce);
-		testStateObject2->GetPhysicsObject()->AddForce(seekforce);
+		TestBehaviourTree();
 		seekNodes.clear();
 	}
 
@@ -354,16 +354,159 @@ void TutorialGame::InitWorld() {
 	}
 }
 
+void TutorialGame::TestBehaviourTree() {
+	float behaviourTimer;
+	float distanceToTarget;
+	BehaviourAction* seek = new BehaviourAction("Find Key",
+		[&](float dt, BehaviourState state)->BehaviourState {
+			if (state == Initialise) {
+				std::cout << "Seeking Target!\n";
+				behaviourTimer = rand() % 100;
+				state = Ongoing;
+
+			}
+			else if (state == Ongoing) {
+				behaviourTimer -= dt;
+				if ((testStateObject->Position() - testStateObject2->Position()).Length() > 100.0f) {
+					std::cout << "Seeking!\n";
+					testStateObject2->GetPhysicsObject()->AddForce(seekforce);
+					return Success;
+				}
+				else {
+					return Success;
+				}
+			}
+			return state; //will be ’ongoing ’ until success
+		}
+	);
+
+	BehaviourAction* goToRoom = new BehaviourAction("Go To Room",
+		[&](float dt, BehaviourState state)->BehaviourState {
+			if (state == Initialise) {
+				//std::cout << "Going to the loot room!\n";
+				state = Ongoing;
+
+			}
+			else if (state == Ongoing) {
+				distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
+				if (distanceToTarget <= 100.0f) {
+					std::cout << "Reached room!\n";
+					testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
+					return Success;
+
+				}
+				return Failure;
+			}
+			return state; //will be ’ongoing ’ until success
+		}
+	);
+
+	BehaviourAction* openDoor = new BehaviourAction("Open Door",
+		[&](float dt, BehaviourState state)->BehaviourState {
+			if (state == Initialise) {
+				std::cout << "Opening Door!\n";
+				return Success;
+
+			}
+			return state;
+		}
+	);
+	BehaviourAction* lookForTreasure = new BehaviourAction(
+		"Look For Treasure",
+		[&](float dt, BehaviourState state)->BehaviourState {
+			if (state == Initialise) {
+				std::cout << "Looking for treasure !\n";
+				return Ongoing;
+
+			}
+			else if (state == Ongoing) {
+				bool found = rand() % 2;
+				if (!found) {
+					std::cout << "I found some treasure !\n";
+					return Success;
+
+				}
+				std::cout << "No treasure in here ...\n";
+				return Failure;
+
+			}
+			return state;
+		}
+	);
+
+	BehaviourAction* lookForItems = new BehaviourAction(
+		"Look For Items",
+		[&](float dt, BehaviourState state)->BehaviourState {
+			if (state == Initialise) {
+				std::cout << "Looking for items!\n";
+				return Ongoing;
+
+			}
+			else if (state == Ongoing) {
+				bool found = rand() % 2;
+				if (!found) {
+					std::cout << "I found some items!\n";
+					return Success;
+
+				}
+				std::cout << "No items in here ...\n";
+				return Failure;
+
+			}
+			return state;
+		}
+	);
+
+	BehaviourSequence* sequence =
+		new BehaviourSequence("Room Sequence");
+	sequence->AddChild(seek);
+	sequence->AddChild(goToRoom);
+	//sequence->AddChild(openDoor);
+
+	BehaviourSelector* selection =
+		new BehaviourSelector("Loot Selection");
+	selection->AddChild(lookForTreasure);
+	selection->AddChild(lookForItems);
+
+	BehaviourSequence* rootSequence =
+		new BehaviourSequence("Root Sequence");
+	rootSequence->AddChild(sequence);
+	//rootSequence->AddChild(selection);
+
+	
+		rootSequence->Reset();
+		//behaviourTimer = 0.0f;
+		//distanceToTarget = rand() % 250;
+		BehaviourState state = Ongoing;
+		//std::cout << "We're going on an adventure !\n";
+		while (state == Ongoing) {
+			state = rootSequence->Execute(1.0f); //fake dt
+
+		}
+		if (state == Success) {
+			//std::cout << "What a successful adventure !\n";
+
+		}
+		else if (state == Failure) {
+			//std::cout << "What a waste of time!\n";
+
+		}
+
+
+		std::cout << "All done!\n";
+	
+}
+
 Vector3 TutorialGame::Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start)  {
 	if (start - count > 0) {
 		current = start - count;
 		Vector3 desired = target[start - count] - seeker;
 		auto l = desired.Length();
-		float speed = 30;
+		float speed = 50;
 		Vector3 d = desired / desired.Length() * speed;
-		if (desired.Length() < 2) {
+		if (desired.Length() < 5) {
 			count++;
-			d = (d / 2 - desired);
+			d = (d / speed) * desired.Length();
 		}
 		Vector3 steering = d - velocity;
 		return steering;
@@ -376,11 +519,11 @@ Vector3 TutorialGame::Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 
 	if (current < target.size() - 5) {
 		Vector3 desired = target[current + 1] - seeker;
 		auto l = desired.Length();
-		float speed = 30;
+		float speed = 25;
 		Vector3 d = desired / desired.Length() * speed;
-		if (desired.Length() < 2) {
-			count--;
-			d = (d / 2) * speed;
+		if (desired.Length() < 5) {
+			count++;
+			d = (d / speed) * desired.Length();
 		}
 		Vector3 steering = d - velocity;
 		return steering;

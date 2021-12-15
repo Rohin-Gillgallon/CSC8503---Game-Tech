@@ -219,7 +219,7 @@ void TestPathfinding() {
 			 }
 			 else if (state == Ongoing) {
 				 bool found = rand() % 2;
-				 if (found) {
+				 if (!found) {
 					 std::cout << "I found some treasure !\n";
 					 return Success;
 
@@ -242,7 +242,7 @@ void TestPathfinding() {
 			 }
 			 else if (state == Ongoing) {
 				 bool found = rand() % 2;
-				 if (found) {
+				 if (!found) {
 					 std::cout << "I found some items!\n";
 					 return Success;
 
@@ -276,7 +276,7 @@ void TestPathfinding() {
 		 behaviourTimer = 0.0f;
 		 distanceToTarget = rand() % 250;
 		 BehaviourState state = Ongoing;
-		 std::cout << "We’re going on an adventure !\n";
+		 std::cout << "We're going on an adventure !\n";
 		 while (state == Ongoing) {
 			 state = rootSequence->Execute(1.0f); //fake dt
 
@@ -308,6 +308,7 @@ hide or show the
 */
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
+	//TestBehaviourTree();
 	/*Grid maze;
 	maze.Build();
 	auto stack = maze.stack;
@@ -319,7 +320,7 @@ int main() {
 	srand(time(0));
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
-
+	
 	TutorialGame* g = new TutorialGame();
 	w->GetTimer()->GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyboardKeys::ESCAPE)) {
@@ -341,7 +342,7 @@ int main() {
 
 		//TestStateMachine();
 		
-		//TestBehaviourTree();
+		
 		
 		//TestPushdownAutomata(w);
 

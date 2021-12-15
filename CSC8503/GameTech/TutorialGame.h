@@ -3,6 +3,10 @@
 #include "../CSC8503Common/PhysicsSystem.h"
 #include "StateGameObject.h"
 #include "../CSC8503Common/NavigationGrid.h"
+#include "..//CSC8503Common/BehaviourNode.h"
+#include "..//CSC8503Common/BehaviourAction.h"
+#include "..//CSC8503Common/BehaviourSequence.h"
+#include "..//CSC8503Common/BehaviourSelector.h"
 
 namespace NCL {
 
@@ -50,7 +54,7 @@ namespace NCL {
 			void DebugObjectMovement();
 			void LockedObjectMovement();
 
-
+			void TestBehaviourTree();
 
 			vector <Vector3 > seekNodes;
 			std::vector<Vector3> walls;
