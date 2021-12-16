@@ -23,9 +23,9 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	//SpawnPoint = Checkpoint4;
+	SpawnPoint = Checkpoint5;
 	Debug::SetRenderer(renderer);
-	state = GameState::Level2;// GameState::Title;
+	state = GameState::Title;
 	InitialiseAssets();
 	count = 1;
 }
@@ -112,6 +112,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::LevelSelect) {
+		InitWorld();
 		Vector4 colourl1 = (select1) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourl2 = (select2) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourl3 = (quit) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
@@ -177,6 +178,21 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 		
 		
+	}
+
+	if (state == GameState::Level1Score) {
+		
+		renderer->DrawString("Time:" + std::to_string(currenttime),
+			Vector2(40, 20));//Draw debug text at 10,20
+
+		renderer->DrawString("Score:" + std::to_string(score), Vector2(40, 40));
+
+		renderer->DrawString("Return to Menu", Vector2(40, 80));
+		Debug::Print("------------------------------", Vector2(20, 95));
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+		{
+			state = GameState::LevelSelect;
+		}
 	}
 
 	if (state == GameState::Level1 || state == GameState::Level2) {
@@ -406,8 +422,11 @@ void TutorialGame::InitWorld() {
 
 	
 	if (state == GameState::Level1) {
+		floorisLava = false;
 		InitDefaultFloor();
-		InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
+		InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f); 
+		AddSphereToWorld(SpawnPoint + Vector3(0, 10, 0), 1.0f, 2.0f);
+		AddCubeToWorld(Vector3(0, 50, 0), Vector3(10, 10, 10));
 		InitAddObstacles();
 		Stairs();
 		JumpPad1();
@@ -426,6 +445,7 @@ void TutorialGame::InitWorld() {
 		AddTeleport();
 		AddGoal();
 		AddBonuses();
+		
 		score = 0;
 	}
 	if (state == GameState::Level2) {
@@ -1098,6 +1118,7 @@ void TutorialGame::AddMazePlatform() {
 	maze6 = AddCubeToWorld(Vector3(0, 0, 0), Vector3(22.5, 6, 1), 0);
 	auto adjust6 = transform * Vector3(11.5, 7, 9);
 	maze6->Respawn(mazeplat->Position() + adjust6);
+	AddCubeToWorldOBB(mazeplat->Position() + Vector3(0, 10, 0), Vector3(1, 1, 1));
 	mazeExit = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, -5, 27)), Vector3(9, 1, 9), 0);
 	auto mazeExitWall1 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, 5, 36)), Vector3(9, 9, 1), 0);
 	auto mazeExitWall2 = AddCubeToWorldOBB((mazeplat->Position() + Vector3(45.5, 5, 18)), Vector3(9, 9, 1), 0);
@@ -1187,6 +1208,7 @@ void TutorialGame::AddProjectilePlatform() {
 void TutorialGame::AddGravityWell() {
 	gravwell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
 	gravwell->GetPhysicsObject()->gravitywell = true;
+	gravwell->GetPhysicsObject()->SetRestitution(1.5);
 }
 
 void TutorialGame::AddBridge() {
@@ -1207,6 +1229,9 @@ void TutorialGame::AddIcePatch() {
 	ice2->GetPhysicsObject()->SetFriction(0.1);
 	auto ice3 = AddCubeToWorld(Vector3(206 + 100 / 8 * 2, 100 / 8 + 20, 100 / 8 * 8), Vector3(100 / 8, 1, 100 / 8), 0);
 	ice3->GetPhysicsObject()->SetFriction(0.1);
+	ice1->GetPhysicsObject()->SetRestitution(0.01);
+	ice2->GetPhysicsObject()->SetRestitution(0.01);
+	ice3->GetPhysicsObject()->SetRestitution(0.01);
 }
 
 void TutorialGame::AddTeleport() {
@@ -1286,15 +1311,15 @@ void TutorialGame::InitCubeGridWorld(int numRows, int numCols, float rowSpacing,
 }
 
 void TutorialGame::InitDefaultFloor() {
-	AddFloorToWorld(Vector3(0, -2, 0));
-	AddFloorToWorld(Vector3(100, -2, 0));
-	AddFloorToWorld(Vector3(0, -2, 100));
-	AddFloorToWorld(Vector3(100, -2, 100));
-	AddFloorToWorld(Vector3(200, -2, 0));
-	AddFloorToWorld(Vector3(0, -2, 200));
-	AddFloorToWorld(Vector3(100, -2, 200));
-	AddFloorToWorld(Vector3(200, -2, 100));
-	AddFloorToWorld(Vector3(200, -2, 200));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(0, -2, 0)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(100, -2, 0)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(0, -2, 100)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(100, -2, 100)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(200, -2, 0)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(0, -2, 200)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(100, -2, 200)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(200, -2, 100)));
+	obsfloor.emplace_back(AddFloorToWorld(Vector3(200, -2, 200)));
 }
 
 void TutorialGame::InitGameExamples() {
@@ -1504,7 +1529,13 @@ line - after the third, they'll be able to twist under torque aswell.
 void TutorialGame::MoveSelectedObject() {
 	if (state == GameState::Level1 || state == GameState::Level2) {
 		renderer->DrawString("Click Force:" + std::to_string(forceMagnitude),
-			Vector2(10, 20));//Draw debug text at 10,20
+			Vector2(5, 70));//Draw debug text at 10,20
+		
+		renderer->DrawString("Life:" + std::to_string(life),
+			Vector2(40, 10));
+		if (life == 0) {
+
+		}
 	}
 	int maxspeed = 50;
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
@@ -1587,11 +1618,24 @@ void TutorialGame::MoveSelectedObject() {
 	if (state == GameState::Level1) {
 		RotatingBridges(-0.1);
 
+		if (floorisLava) {
+			CollisionDetection::CollisionInfo info0;
+			for (int i = 0; i < obsfloor.size(); i++) {
+				obsfloor[i]->GetRenderObject()->SetColour(Vector4(1, 0.5, 0, 1));
+				if (CollisionDetection::ObjectIntersection(Ball, obsfloor[i], info0))
+				{
+					life--;
+					Ball->Respawn(SpawnPoint);
+				}
+			}
+		}
+
 		CollisionDetection::CollisionInfo info1;
 		if (CollisionDetection::ObjectIntersection(Ball, stair9, info1))
 		{
 			std::cout << "Checkpoint Reached\n";
 			SpawnPoint = Checkpoint1;
+			floorisLava = true;
 		}
 		CollisionDetection::CollisionInfo info2;
 		if (CollisionDetection::ObjectIntersection(Ball, floora, info2)) {
@@ -1601,7 +1645,7 @@ void TutorialGame::MoveSelectedObject() {
 			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 			useGravity = true;
-			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 2750, Vector3(200.149, 12.2566, -2.58092));
+			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3500, Vector3(200.149, 12.2566, -2.58092));
 		}
 
 		CollisionDetection::CollisionInfo info3;
@@ -1673,7 +1717,7 @@ void TutorialGame::MoveSelectedObject() {
 
 		CollisionDetection::CollisionInfo info10;
 		if (CollisionDetection::ObjectIntersection(Ball, goal, info10)) {
-
+			score = currenttime - score;
 			state = GameState::Level1Score;
 			InitWorld();
 		}
@@ -1699,6 +1743,7 @@ void TutorialGame::MoveSelectedObject() {
 		if (CollisionDetection::ObjectIntersection(testStateObject, testStateObject2, info11)) {
 			testStateObject->Respawn(Vector3(10, 0, 10));
 			testStateObject2->Respawn(Vector3(290, 0, 290));
+			life--;
 		}
 
 		for (int i = 0; i < freezeBomb.size(); i++) {

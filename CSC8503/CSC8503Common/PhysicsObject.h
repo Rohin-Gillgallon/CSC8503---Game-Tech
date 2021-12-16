@@ -59,12 +59,20 @@ namespace NCL {
 				return friction;
 			}
 
+			float GetRestitution() {
+				return elasticity;
+			}
+
 			Vector3 GetAccelertion() {
 				return force * inverseMass;
 			}
 
 			void SetFriction(float f) {
 				friction = f;
+			}
+
+			void SetRestitution(float e) {
+				elasticity = e;
 			}
 
 			void SetAngularVelocity(const Vector3& v) {

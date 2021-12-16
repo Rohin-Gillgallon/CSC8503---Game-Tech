@@ -194,6 +194,7 @@ namespace NCL {
 			bool hold = false;
 			bool Teleport1 = false;
 			bool Teleport2 = false;
+			bool floorisLava = false;
 
 			bool select1 = true;
 			bool select2 = false;
@@ -210,6 +211,7 @@ namespace NCL {
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 * 3.14 / 180), 0);
+			int life = 5;
 			int liftcount = 0;
 			float forceMagnitude;
 			long starttime;
@@ -258,6 +260,7 @@ namespace NCL {
 			GameObject* teleport;
 			GameObject* goal;
 
+			vector<GameObject*> obsfloor;
 			vector<GameObject*> mazefloor;
 			vector<GameObject*> mazewalls;
 			vector<GameObject*> bonuses;
