@@ -23,7 +23,7 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	SpawnPoint = Checkpoint1;
+	//SpawnPoint = Checkpoint1;
 	Debug::SetRenderer(renderer);
 	state = GameState::Title;
 	InitialiseAssets();
@@ -185,7 +185,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::Level1Score) {
-		
+		InitWorld();
 		renderer->DrawString("Time:" + std::to_string(currenttime),
 			Vector2(40, 20));//Draw debug text at 10,20
 
@@ -200,7 +200,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::Level2Score) {
-
+		InitWorld();
 		renderer->DrawString("Time:" + std::to_string(currenttime),
 			Vector2(40, 20));//Draw debug text at 10,20
 
@@ -1582,8 +1582,6 @@ void TutorialGame::MoveSelectedObject() {
 		
 	}
 
-	
-
 	int maxspeed = 50;
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
@@ -1664,6 +1662,17 @@ void TutorialGame::MoveSelectedObject() {
 
 	if (state == GameState::Level1) {
 		RotatingBridges(-0.1);
+
+		if (Ball->Position().y < -100)
+		{
+			life--;
+
+			death = true;
+
+			if (death) {
+				state = GameState::Death;
+			}
+		}
 
 		if (floorisLava) {
 			CollisionDetection::CollisionInfo info0;
