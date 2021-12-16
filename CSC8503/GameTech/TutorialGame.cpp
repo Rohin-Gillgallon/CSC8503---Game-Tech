@@ -25,7 +25,7 @@ TutorialGame::TutorialGame()	{
 	rotateFloor = false;
 	//SpawnPoint = Checkpoint4;
 	Debug::SetRenderer(renderer);
-	state = GameState::Title;
+	state = GameState::Level2;// GameState::Title;
 	InitialiseAssets();
 	count = 1;
 }
@@ -427,9 +427,11 @@ void TutorialGame::InitWorld() {
 	if (state == GameState::Level2) {
 		Addmazefloor();
 		testStateObject = AddStateObjectToWorld(Vector3(10, -2.5, 10), 2.5f, 0.1f);
+		testStateObject->GetRenderObject()->SetColour(Vector4(0.0, 0.0, 1.0, 1.0));
 		testStateObject2 = AddStateObjectToWorld(Vector3(290, -2.5, 290), 2.5f, 0.1f);
+		testStateObject2->GetRenderObject()->SetColour(Vector4(1.0, 0.0, 0.0, 1.0));
 		AddWalls();
-		
+		AddPowerUps();
 	}
 }
 
@@ -459,7 +461,7 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				behaviourTimer -= dt;
-				if ((testStateObject->Position() - testStateObject2->Position()).Length() > 100.0f) {
+				if ((testStateObject->Position() - testStateObject2->Position()).Length() > 10.0f) {
 					std::cout << "Seeking!\n";
 					testStateObject2->GetPhysicsObject()->AddForce(seekforce);
 					return Success;
@@ -481,7 +483,7 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
-				if (distanceToTarget <= 100.0f) {
+				if (distanceToTarget <= 10.0f) {
 					std::cout << "Reached room!\n";
 					testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
 					return Success;
@@ -627,7 +629,8 @@ Vector3 TutorialGame::Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 
 void TutorialGame::Addmazefloor() {
 	for (int i = 0; i < 8; i++) {
 		for (int j = 0; j < 8; j++) {
-			AddMazeFloorToWorld(Vector3(20 + i * 40, -5, 20 + j * 40));
+			mazefloor.emplace_back(AddMazeFloorToWorld(Vector3(20 + i * 40, -5, 20 + j * 40)));
+			mazefloor[i * 8 + j]->GetRenderObject()->SetColour(Vector4(0.5, 0.5, 0.5, 1.0));
 		}
 	}
 	
@@ -636,8 +639,16 @@ void TutorialGame::Addmazefloor() {
 void TutorialGame::AddWalls() {
 	TestPathfinding(testStateObject->Position(), seekNodes);
 	for (int i = 0; i < walls.size(); i++) {
-		AddCubeToWorld(walls[i] + Vector3(0, 2, 0), Vector3(5, 5, 5), 0, false);
-		
+		mazewalls.emplace_back(AddCubeToWorld(walls[i] + Vector3(0, 2, 0), Vector3(5, 5, 5), 0, false));
+		mazewalls[i]->GetRenderObject()->SetColour(Vector4(0.3, 0.9, 0.3, 1.0));
+	}
+}
+
+void TutorialGame::AddPowerUps() {
+	freezeBomb.emplace_back(AddBonusToWorld(route[route.size() - 56] + Vector3(0, 3, 0)));
+	for (int i = 0; i < freezeBomb.size(); i++) {
+		freezeBomb[i]->GetRenderObject()->SetColour(Vector4(0.1, 0.7, 1.0, 1.0));
+		freezeBomb[i]->GetTransform().SetScale(Vector3(0.5, 0.5, 0.5));
 	}
 }
 
@@ -1318,7 +1329,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	apple->GetTransform()
 		.SetScale(Vector3(size, size, size))
 		.SetPosition(position);
-	
+	apple->setCollsion(false);
 	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 	apple->SetName("Bonus");
@@ -1645,11 +1656,45 @@ void TutorialGame::MoveSelectedObject() {
 		}
 	}
 
-	/*if (state == GameState::Level2) {
-		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
-		force = Seek(testStateObject->Position(), testStateObject2->Position(), velocity);
-		testStateObject2->GetPhysicsObject()->AddForce(force);
-	}*/
+	if (state == GameState::Level2) {
+		CollisionDetection::CollisionInfo info11;
+		if (CollisionDetection::ObjectIntersection(testStateObject, testStateObject2, info11)) {
+			testStateObject->Respawn(Vector3(10, 0, 10));
+			testStateObject2->Respawn(Vector3(290, 0, 290));
+		}
+
+		for (int i = 0; i < freezeBomb.size(); i++) {
+			if ((testStateObject->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
+				player2freeze = true;
+				p2count = 0;
+				freezeBomb[i]->Respawn(Vector3(150, -25, 150));
+			}
+			if ((testStateObject2->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
+				player1freeze = true;
+				p1count = 0;
+				freezeBomb[i]->Respawn(Vector3(150, -25, 150));
+			}
+			freezeBomb[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 0.3));
+		}
+
+		if (player1freeze) {
+			p1count++;
+			testStateObject->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+			testStateObject->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+			if (p1count >= 500) {
+				player1freeze = false;
+			}
+		}
+
+		if (player2freeze) {
+			p2count++;
+			testStateObject2->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+			testStateObject2->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+			if (p2count >= 500) {
+				player2freeze = false;
+			}
+		}
+	}
 
 	 if (!selectionObject) {
 		 return;//we haven’t selected anything!

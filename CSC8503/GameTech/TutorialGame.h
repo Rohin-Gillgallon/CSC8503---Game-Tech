@@ -66,6 +66,7 @@ namespace NCL {
 			vector <Vector3 > seekNodes;
 			std::vector<Vector3> walls;
 			std::vector<Vector3> route;
+			
 
 			void TestPathfinding(Vector3 target, vector<Vector3>& testNodes) {
 				NavigationGrid grid("TestGrid1.txt");
@@ -146,6 +147,7 @@ namespace NCL {
 
 			void Addmazefloor();
 			void AddWalls();
+			void AddPowerUps();
 
 			int NearestPoint(Vector3 position);
 
@@ -173,6 +175,14 @@ namespace NCL {
 			bool select1 = true;
 			bool select2 = false;
 			bool quit = false;
+
+			bool player1freeze = false;
+			bool player2freeze = false;
+			bool player1up = false;
+			bool player2up = false;
+
+			int p1count;
+			int p2count;
 			int MenuLine;
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
@@ -225,7 +235,10 @@ namespace NCL {
 			GameObject* teleport;
 			GameObject* goal;
 
+			vector<GameObject*> mazefloor;
+			vector<GameObject*> mazewalls;
 			vector<GameObject*> bonuses;
+			vector<GameObject*> freezeBomb;
 
 			OGLMesh* capsuleMesh = nullptr;
 			OGLMesh* cubeMesh = nullptr;
