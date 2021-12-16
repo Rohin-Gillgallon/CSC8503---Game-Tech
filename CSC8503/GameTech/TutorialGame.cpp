@@ -112,12 +112,16 @@ void TutorialGame::UpdateGame(float dt) {
 		Vector4 colourl2 = (select2) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourl3 = (quit) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourlline;
-		Debug::Print("Please Select Which Level You Would Like To Play", Vector2(20, 10));
+		Debug::Print("Please Select Which Level You Would Like To Play", Vector2(10, 10));
+		Debug::Print("Press space to select:", Vector2(10, 25));
 		Debug::Print("Level 1: Obstacle Course", Vector2(20, 40), colourl1);
 		Debug::Print("Level 2: Evil Maze", Vector2(20, 60), colourl2);
 		Debug::Print("Quit", Vector2(20, 90), colourl3);
 		if (menu == LevelSelectState::Level1) {
 			int MenuLine = 45;
+			select1 = true;
+			select2 = false;
+			quit = false;
 			colourlline = colourl1;
 			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
 			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
@@ -132,8 +136,11 @@ void TutorialGame::UpdateGame(float dt) {
 				InitWorld();
 			}
 		}else if (menu == LevelSelectState::Level2) {
+			select1 = false;
+			select2 = true;
+			quit = false;
 			int MenuLine = 65;
-			colourlline = colourl1;
+			colourlline = colourl2;
 			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
 			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
 				menu = LevelSelectState::Level1;
@@ -147,7 +154,11 @@ void TutorialGame::UpdateGame(float dt) {
 				InitWorld();
 			}
 		} else if (menu == LevelSelectState::Quit) {
+			select1 = false;
+			select2 = false;
+			quit = true;
 			int MenuLine = 95;
+			colourlline = colourl3;
 			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
 			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
 				menu = LevelSelectState::Level2;
