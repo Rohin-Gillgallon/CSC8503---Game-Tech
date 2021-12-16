@@ -478,7 +478,7 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				behaviourTimer -= dt;
-				if ((testStateObject->Position() - testStateObject2->Position()).Length() > 10.0f) {
+				if ((testStateObject->Position() - testStateObject2->Position()).Length() > 0.0f) {
 					std::cout << "Seeking!\n";
 					testStateObject2->GetPhysicsObject()->AddForce(seekforce);
 					return Success;
@@ -500,14 +500,10 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				if (!player1freeze) {
-					
 					distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
 					float distanceTopower = (testStateObject2->Position() - freezeBomb[0]->Position()).Length();
 					if (distanceToTarget > distanceTopower) {
 						std::cout << "Aquiring Power Up!\n";
-						if (fleeforce == Vector3(0, 0, 0)) {
-							return Failure;
-						}
 						testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
 						return Failure;
 
@@ -523,11 +519,18 @@ void TutorialGame::TestBehaviourTree() {
 	BehaviourAction* openDoor = new BehaviourAction("Open Door",
 		[&](float dt, BehaviourState state)->BehaviourState {
 			if (state == Initialise) {
-				std::cout << "Opening Door!\n";
+				//std::cout << "Going to the loot room!\n";
+				state = Ongoing;
+
+			}
+			else if (state == Ongoing) {
+				if (player1up) {
+					return Success;
+				}
 				return Success;
 
 			}
-			return state;
+			return state; //will be ’ongoing ’ until success
 		}
 	);
 	BehaviourAction* lookForTreasure = new BehaviourAction(
@@ -578,9 +581,9 @@ void TutorialGame::TestBehaviourTree() {
 
 	BehaviourSequence* sequence =
 		new BehaviourSequence("Room Sequence");
+	sequence->AddChild(openDoor);
 	sequence->AddChild(goToRoom);
 	sequence->AddChild(seek);
-	//sequence->AddChild(openDoor);
 
 	BehaviourSelector* selection =
 		new BehaviourSelector("Loot Selection");
@@ -640,10 +643,10 @@ Vector3 TutorialGame::Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 
 		auto l = desired.Length();
 		float speed = 25;
 		Vector3 d = desired / desired.Length() * speed;
-		if (desired.Length() < 1) {
+		/*if (desired.Length() < 1) {
 			count++;
 			d = (d / speed) * desired.Length();
-		}
+		}*/
 		Vector3 steering = d - velocity;
 		return steering;
 	}
@@ -670,13 +673,20 @@ void TutorialGame::AddWalls() {
 }
 
 void TutorialGame::AddPowerUps() {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5 ; i++) {
 		int index = rand() % route.size();
-		freezeBomb.emplace_back(AddBonusToWorld(route[route.size() - index] + Vector3(0, 3, 0)));
+		freezeBomb.emplace_back(AddBonusToWorld(route[index] + Vector3(0, 3, 0)));
+		
+		index = rand() % route.size();
+		shield.emplace_back(AddBonusToWorld(route[index] + Vector3(0, 3, 0)));
 	}
 	for (int i = 0; i < freezeBomb.size(); i++) {
 		freezeBomb[i]->GetRenderObject()->SetColour(Vector4(0.1, 0.7, 1.0, 1.0));
 		freezeBomb[i]->GetTransform().SetScale(Vector3(0.5, 0.5, 0.5));
+	}
+	for (int i = 0; i < shield.size(); i++) {
+		shield[i]->GetRenderObject()->SetColour(Vector4(0.9, 0.2, 0.6, 1.0));
+		shield[i]->GetTransform().SetScale(Vector3(0.5, 0.5, 0.5));
 	}
 }
 
@@ -1692,19 +1702,48 @@ void TutorialGame::MoveSelectedObject() {
 		}
 
 		for (int i = 0; i < freezeBomb.size(); i++) {
-			if ((testStateObject->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
-				player2freeze = true;
-				p2count = 0;
-				int index = rand() % route.size();
-				freezeBomb[i]->Respawn(route[index]);
+			if ((testStateObject->Position() - freezeBomb[i]->Position()).Length() < 7.5f) {
+				if (!player2up) {
+					player2freeze = true;
+					p2count = 0;
+					int index = rand() % route.size();
+					freezeBomb[i]->Respawn(route[index]);
+				}
+				else {
+					p2count = 0;
+				}
 			}
-			if ((testStateObject2->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
-				player1freeze = true;
-				p1count = 0;
-				int index = rand() % route.size();
-				freezeBomb[i]->Respawn(route[index]);
+			if ((testStateObject2->Position() - freezeBomb[i]->Position()).Length() < 7.5f) {
+				if (!player1up) {
+					player1freeze = true;
+					p1count = 0;
+					int index = rand() % route.size();
+					freezeBomb[i]->Respawn(route[index]);
+				}
+				else {
+					p1count = 0;
+				}
 			}
 			freezeBomb[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 0.3));
+		}
+
+		for (int i = 0; i < shield.size(); i++) {
+			if ((testStateObject->Position() - shield[i]->Position()).Length() < 7.5f) {
+
+				player1up = true;
+				p2count = 0;
+				int index = rand() % route.size();
+				shield[i]->Respawn(route[index]);
+
+			}
+			if ((testStateObject2->Position() - shield[i]->Position()).Length() < 7.5f) {
+
+				player2up = true;
+				p1count = 0;
+				int index = rand() % route.size();
+				shield[i]->Respawn(route[index]);
+			}
+			shield[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -0.3));
 		}
 
 		if (player1freeze) {
@@ -1722,6 +1761,20 @@ void TutorialGame::MoveSelectedObject() {
 			testStateObject2->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 			if (p2count >= 250) {
 				player2freeze = false;
+			}
+		}
+
+		if (player1up) {
+			p2count++;
+			if (p2count >= 250) {
+				player1up = false;
+			}
+		}
+
+		if (player2up) {
+			p2count++;
+			if (p2count >= 250) {
+				player2up = false;
 			}
 		}
 	}

@@ -262,6 +262,7 @@ namespace NCL {
 			vector<GameObject*> mazewalls;
 			vector<GameObject*> bonuses;
 			vector<GameObject*> freezeBomb;
+			vector<GameObject*> shield;
 
 			OGLMesh* capsuleMesh = nullptr;
 			OGLMesh* cubeMesh = nullptr;
