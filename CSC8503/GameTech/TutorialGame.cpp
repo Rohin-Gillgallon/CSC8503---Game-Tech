@@ -25,7 +25,7 @@ TutorialGame::TutorialGame()	{
 	rotateFloor = false;
 	//SpawnPoint = Checkpoint4;
 	Debug::SetRenderer(renderer);
-	state = GameState::Level2;
+	state = GameState::Title;
 	InitialiseAssets();
 	count = 1;
 }
@@ -97,11 +97,80 @@ void TutorialGame::UpdateGame(float dt) {
 
 	UpdateKeys();
 
-	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(5, 95));
+	if (state == GameState::Title) {
+		Debug::Print("8503 Advanced Game Tech Course Work", Vector2(20, 40));
+		Debug::Print("Please Press Enter to Continue", Vector2(20, 70));
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::RETURN))
+		{
+			state = GameState::LevelSelect;
+			menu = LevelSelectState::Level1;
+		}
 	}
-	else {
-		Debug::Print("(G)ravity off", Vector2(5, 95));
+
+	if (state == GameState::LevelSelect) {
+		Vector4 colourl1 = (select1) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
+		Vector4 colourl2 = (select2) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
+		Vector4 colourl3 = (quit) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
+		Vector4 colourlline;
+		Debug::Print("Please Select Which Level You Would Like To Play", Vector2(20, 10));
+		Debug::Print("Level 1: Obstacle Course", Vector2(20, 40), colourl1);
+		Debug::Print("Level 2: Evil Maze", Vector2(20, 60), colourl2);
+		Debug::Print("Quit", Vector2(20, 90), colourl3);
+		if (menu == LevelSelectState::Level1) {
+			int MenuLine = 45;
+			colourlline = colourl1;
+			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
+				menu = LevelSelectState::Quit;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN)) {
+				menu = LevelSelectState::Level2;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+			{
+				state = GameState::Level1;
+				InitWorld();
+			}
+		}else if (menu == LevelSelectState::Level2) {
+			int MenuLine = 65;
+			colourlline = colourl1;
+			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
+				menu = LevelSelectState::Level1;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN)) {
+				menu = LevelSelectState::Quit;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+			{
+				state = GameState::Level2;
+				InitWorld();
+			}
+		} else if (menu == LevelSelectState::Quit) {
+			int MenuLine = 95;
+			Debug::Print("------------------------------", Vector2(20, MenuLine), colourlline);
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::UP)) {
+				menu = LevelSelectState::Level2;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::DOWN)) {
+				menu = LevelSelectState::Level1;
+			}
+			if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+			{
+				state = GameState::Title;
+			}
+		}
+		
+		
+	}
+
+	if (state == GameState::Level1 || state == GameState::Level2) {
+		if (useGravity) {
+			Debug::Print("(G)ravity on", Vector2(5, 95));
+		}
+		else {
+			Debug::Print("(G)ravity off", Vector2(5, 95));
+		}
 	}
 
 	if (state == GameState::Level1) {
@@ -113,15 +182,13 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 	}
 
-	if (state == GameState::Level2) {
-		
+	if (state == GameState::Level1 || state == GameState::Level2) {
+		currenttime = time(0) - starttime;
+		renderer->DrawString("Time:" + std::to_string(currenttime),
+			Vector2(5, 10));//Draw debug text at 10,20
+
+		renderer->DrawString("Score:" + std::to_string(score), Vector2(80, 10));
 	}
-
-	currenttime = time(0) - starttime;
-	renderer->DrawString("Time:" + std::to_string(currenttime),
-		Vector2(5, 10));//Draw debug text at 10,20
-
-	renderer->DrawString("Score:" + std::to_string(score), Vector2(80, 10));
 
 	SelectObject();
 	MoveSelectedObject();
@@ -162,11 +229,12 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::F2)) {
 		InitCamera(); //F2 will reset the camera to a specific default place
 	}
-
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
-		Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-		Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-		Ball->Respawn(SpawnPoint);
+	if (state == GameState::Level1) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::R)) {
+			Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+			Ball->Respawn(SpawnPoint);
+		}
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::T)) {
@@ -321,8 +389,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
-	//InitGameExamples();
+	
 	if (state == GameState::Level1) {
 		InitDefaultFloor();
 		InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f);
@@ -1282,88 +1349,90 @@ letting you move the camera around.
 
 */
 bool TutorialGame::SelectObject() {
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::Q)) {
-		inSelectionMode = !inSelectionMode;
+	if (state == GameState::Level1 || state == GameState::Level2) {
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::Q)) {
+			inSelectionMode = !inSelectionMode;
+			if (inSelectionMode) {
+				Window::GetWindow()->ShowOSPointer(true);
+				Window::GetWindow()->LockMouseToWindow(false);
+			}
+			else {
+				Window::GetWindow()->ShowOSPointer(false);
+				Window::GetWindow()->LockMouseToWindow(true);
+			}
+		}
 		if (inSelectionMode) {
-			Window::GetWindow()->ShowOSPointer(true);
-			Window::GetWindow()->LockMouseToWindow(false);
+			renderer->DrawString("Press Q to change to camera mode!", Vector2(5, 85));
+
+			if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
+				if (selectionObject) {	//set colour to deselected;
+					selectionObject->GetRenderObject()->SetColour(colour);
+					selectionObject = nullptr;
+					lockedObject = nullptr;
+				}
+
+				if (selectionObject2) {	//set colour to deselected;
+					selectionObject2->GetRenderObject()->SetColour(colour2);
+					selectionObject2 = nullptr;
+					lockedObject = nullptr;
+				}
+
+				Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+
+				RayCollision closestCollision;
+				if (world->Raycast(ray, closestCollision, true, selectionObject)) {
+					selectionObject = (GameObject*)closestCollision.node;
+					ActiveObject = selectionObject;
+					colour = selectionObject->GetRenderObject()->GetColour();
+					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
+
+					Ray objray = selectionObject->CreateRay();
+					{
+						if (world->Raycast(objray, closestCollision, true, selectionObject)) {
+							selectionObject2 = (GameObject*)closestCollision.node;
+							Debug::DrawLine(selectionObject->Position(), selectionObject2->Position(), Vector4(1, 0, 0, 1), 60);
+							colour2 = selectionObject2->GetRenderObject()->GetColour();
+							selectionObject2->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
+							return true;
+						}
+						else {
+							return false;
+						}
+					}
+					return true;
+				}
+				else {
+					return false;
+				}
+
+			}
 		}
 		else {
-			Window::GetWindow()->ShowOSPointer(false);
-			Window::GetWindow()->LockMouseToWindow(true);
+			renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
 		}
-	}
-	if (inSelectionMode) {
-		renderer->DrawString("Press Q to change to camera mode!", Vector2(5, 85));
 
-		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::LEFT)) {
-			if (selectionObject) {	//set colour to deselected;
-				selectionObject->GetRenderObject()->SetColour(colour);
-				selectionObject = nullptr;
-				lockedObject	= nullptr;
-			}
-			
-			if (selectionObject2) {	//set colour to deselected;
-				selectionObject2->GetRenderObject()->SetColour(colour2);
-				selectionObject2 = nullptr;
-				lockedObject = nullptr;
-			}
-		
-			Ray ray = CollisionDetection::BuildRayFromMouse(*world->GetMainCamera());
+		if (lockedObject) {
+			renderer->DrawString("Press L to unlock object!", Vector2(5, 80));
+		}
 
-			RayCollision closestCollision;
-			if (world->Raycast(ray, closestCollision, true, selectionObject)) {
-				selectionObject = (GameObject*)closestCollision.node;
-				ActiveObject = selectionObject;
-				colour = selectionObject->GetRenderObject()->GetColour();
-				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
-				
-				Ray objray = selectionObject->CreateRay();
-				{
-					if (world->Raycast(objray, closestCollision, true, selectionObject)) {
-						selectionObject2 = (GameObject*)closestCollision.node;
-						Debug::DrawLine(selectionObject->Position(), selectionObject2->Position(), Vector4(1, 0, 0, 1), 60);
-						colour2 = selectionObject2->GetRenderObject()->GetColour();
-						selectionObject2->GetRenderObject()->SetColour(Vector4(0, 0, 1, 1));
-						return true;
-					}
-					else {
-						return false;
-					}
+		else if (selectionObject) {
+			renderer->DrawString("Press L to lock selected object object!", Vector2(5, 80));
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
+			if (selectionObject) {
+				if (lockedObject == selectionObject) {
+					lockedObject = nullptr;
 				}
-				return true;
-			}
-			else {
-				return false;
+				else {
+					lockedObject = selectionObject;
+				}
 			}
 
 		}
-	}
-	else {
-		renderer->DrawString("Press Q to change to select mode!", Vector2(5, 85));
-	}
 
-	if (lockedObject) {
-		renderer->DrawString("Press L to unlock object!", Vector2(5, 80));
+		return false;
 	}
-
-	else if(selectionObject){
-		renderer->DrawString("Press L to lock selected object object!", Vector2(5, 80));
-	}
-
-	if (Window::GetKeyboard()->KeyPressed(NCL::KeyboardKeys::L)) {
-		if (selectionObject) {
-			if (lockedObject == selectionObject) {
-				lockedObject = nullptr;
-			}
-			else {
-				lockedObject = selectionObject;
-			}
-		}
-
-	}
-
-	return false;
 }
 
 /*
@@ -1373,8 +1442,10 @@ added linear motion into our physics system. After the second tutorial, objects 
 line - after the third, they'll be able to twist under torque aswell.
 */
 void TutorialGame::MoveSelectedObject() {
-	renderer->DrawString("Click Force:" + std::to_string(forceMagnitude),
-		Vector2(10, 20));//Draw debug text at 10,20
+	if (state == GameState::Level1 || state == GameState::Level2) {
+		renderer->DrawString("Click Force:" + std::to_string(forceMagnitude),
+			Vector2(10, 20));//Draw debug text at 10,20
+	}
 
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 

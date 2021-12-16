@@ -12,15 +12,21 @@ namespace NCL {
 
 	enum class GameState {
 		Title = 0,
-		Menu = 1,
+		LevelSelect = 1,
 		Level1 = 2,
 		Level1Score = 3,
 		Level2 = 4,
 		Level2Score = 5
 	};
 
+	enum class LevelSelectState {
+		Level1 = 0,
+		Level2 = 1,
+		Quit = 2
+	};
+
 	namespace CSC8503 {
-		class TutorialGame		{
+		class TutorialGame {
 		public:
 			TutorialGame();
 			~TutorialGame();
@@ -33,6 +39,7 @@ namespace NCL {
 		protected:
 
 			GameState state;
+			LevelSelectState menu;
 
 			void InitialiseAssets();
 
@@ -48,7 +55,7 @@ namespace NCL {
 			void InitCubeGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, const Vector3& cubeDims);
 			void InitDefaultFloor();
 			void BridgeConstraintTest();
-	
+
 			bool SelectObject();
 			void MoveSelectedObject();
 			void DebugObjectMovement();
@@ -60,7 +67,7 @@ namespace NCL {
 			std::vector<Vector3> walls;
 			std::vector<Vector3> route;
 
-			void TestPathfinding(Vector3 target, vector<Vector3> &testNodes) {
+			void TestPathfinding(Vector3 target, vector<Vector3>& testNodes) {
 				NavigationGrid grid("TestGrid1.txt");
 				walls = grid.GetWalls();
 				route = grid.GetRoute();
@@ -100,7 +107,7 @@ namespace NCL {
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, float inverseMass = 10.0f);
 			GameObject* AddCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f, bool active = true);
 			GameObject* AddCubeToWorldOBB(const Vector3& position, Vector3 dimensions, float inverseMass = 10.0f);
-			
+
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f);
 
 			GameObject* AddPlayerToWorld(const Vector3& position);
@@ -111,9 +118,9 @@ namespace NCL {
 			StateGameObject* testStateObject;
 			StateGameObject* testStateObject2;
 
-			GameTechRenderer*	renderer;
-			PhysicsSystem*		physics;
-			GameWorld*			world;
+			GameTechRenderer* renderer;
+			PhysicsSystem* physics;
+			GameWorld* world;
 
 			void Stairs();
 			void JumpPad1();
@@ -146,7 +153,7 @@ namespace NCL {
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
 			Vector3 Checkpoint2 = Vector3(100 / 8 * 12.5 + 100 / 12, 100 / 12 + 50, 100 / 8 * 4.75 + 1);
 			Vector3 Checkpoint3 = Vector3(-3, 100 / 8 + 50, 100 / 8 * 10.75 + 1);
-			Vector3 Checkpoint4 = Vector3(81, 100/8+55, 100/8*19+27);
+			Vector3 Checkpoint4 = Vector3(81, 100 / 8 + 55, 100 / 8 * 19 + 27);
 			Vector3 Checkpoint5 = Vector3(201 - 100 / 8 * 3, 100 / 8 + 80, 100 / 8 * 19.5);
 			Vector4 colour;
 			Vector4 colour2;
@@ -163,8 +170,13 @@ namespace NCL {
 			bool Teleport1 = false;
 			bool Teleport2 = false;
 
+			bool select1 = true;
+			bool select2 = false;
+			bool quit = false;
+			int MenuLine;
+
 			Vector3 stairlift = Vector3(0, 0.1, 0);
-			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 *  3.14 / 180), 0);
+			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 * 3.14 / 180), 0);
 			int liftcount = 0;
 			float forceMagnitude;
 			long starttime;
@@ -212,24 +224,24 @@ namespace NCL {
 			GameObject* bounce;
 			GameObject* teleport;
 			GameObject* goal;
-			
+
 			vector<GameObject*> bonuses;
 
-			OGLMesh*	capsuleMesh = nullptr;
-			OGLMesh*	cubeMesh	= nullptr;
-			OGLMesh*	sphereMesh	= nullptr;
-			OGLTexture* basicTex	= nullptr;
-			OGLShader*	basicShader = nullptr;
+			OGLMesh* capsuleMesh = nullptr;
+			OGLMesh* cubeMesh = nullptr;
+			OGLMesh* sphereMesh = nullptr;
+			OGLTexture* basicTex = nullptr;
+			OGLShader* basicShader = nullptr;
 
 			//Coursework Meshes
-			OGLMesh*	charMeshA	= nullptr;
-			OGLMesh*	charMeshB	= nullptr;
-			OGLMesh*	enemyMesh	= nullptr;
-			OGLMesh*	bonusMesh	= nullptr;
+			OGLMesh* charMeshA = nullptr;
+			OGLMesh* charMeshB = nullptr;
+			OGLMesh* enemyMesh = nullptr;
+			OGLMesh* bonusMesh = nullptr;
 
 			//Coursework Additional functionality	
-			GameObject* lockedObject	= nullptr;
-			Vector3 lockedOffset		= Vector3(0, 14, 20);
+			GameObject* lockedObject = nullptr;
+			Vector3 lockedOffset = Vector3(0, 14, 20);
 			void LockCameraToObject(GameObject* o) {
 				lockedObject = o;
 			}
