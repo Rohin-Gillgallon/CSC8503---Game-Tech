@@ -85,14 +85,17 @@ void TutorialGame::UpdateGame(float dt) {
 
 	if (state == GameState::Level2) {
 		TestPathfinding(testStateObject2->Position(), seekNodes);
-		DisplayPathfinding();
+		DisplayPathfinding(seekNodes, Vector4(0, 1, 0, 1));
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
 		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
-		//fleeforce = Flee(seekNodes, testStateObject2->Position(), velocity, start);
 		//testStateObject2->Update(dt, seekforce, fleeforce);
+		Path(freezeBomb[0]->Position(), testStateObject2->Position(), powerups);
+		fleeforce = Seek(powerups, testStateObject2->Position(), velocity, start);
+		DisplayPathfinding(powerups, Vector4(1, 1, 0, 1));
 		TestBehaviourTree();
 		//int dist = NearestPoint(testStateObject->Position());
 		seekNodes.clear();
+		powerups.clear();
 	}
 
 	UpdateKeys();
@@ -483,13 +486,14 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
-				if (distanceToTarget <= 10.0f) {
-					std::cout << "Reached room!\n";
+				float distanceTopower = (testStateObject2->Position() - freezeBomb[0]->Position()).Length();
+				if (distanceToTarget > distanceTopower) {
+					std::cout << "Aquiring Power Up!\n";
 					testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
-					return Success;
+					return Failure;
 
 				}
-				return Failure;
+				return Success;
 			}
 			return state; //will be ’ongoing ’ until success
 		}
@@ -553,8 +557,8 @@ void TutorialGame::TestBehaviourTree() {
 
 	BehaviourSequence* sequence =
 		new BehaviourSequence("Room Sequence");
+	sequence->AddChild(goToRoom);
 	sequence->AddChild(seek);
-	//sequence->AddChild(goToRoom);
 	//sequence->AddChild(openDoor);
 
 	BehaviourSelector* selection =
@@ -1468,7 +1472,7 @@ void TutorialGame::MoveSelectedObject() {
 		renderer->DrawString("Click Force:" + std::to_string(forceMagnitude),
 			Vector2(10, 20));//Draw debug text at 10,20
 	}
-
+	int maxspeed = 50;
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
 	if (Window::GetKeyboard()->KeyDown(KeyboardKeys::UP))
@@ -1487,7 +1491,7 @@ void TutorialGame::MoveSelectedObject() {
 			}
 		}
 		if (state == GameState::Level2) {
-			testStateObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * forceMagnitude);
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(1, 0, 0) * maxspeed);
 		}
 	}
 
@@ -1506,7 +1510,7 @@ void TutorialGame::MoveSelectedObject() {
 			}
 		}
 		if (state == GameState::Level2) {
-			testStateObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * forceMagnitude);
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(-1, 0, 0) * maxspeed);
 		}
 	}
 
@@ -1524,7 +1528,7 @@ void TutorialGame::MoveSelectedObject() {
 				RotatingBridges(0.1);
 		}
 		if (state == GameState::Level2) {
-			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * forceMagnitude);
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, 1) * maxspeed);
 		}
 	}
 
@@ -1542,7 +1546,7 @@ void TutorialGame::MoveSelectedObject() {
 				RotatingBridges(-0.1);
 		}
 		if (state == GameState::Level2) {
-			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * forceMagnitude);
+			testStateObject->GetPhysicsObject()->AddForce(Vector3(0, 0, -1) * maxspeed);
 		}
 	}
 
@@ -1667,12 +1671,14 @@ void TutorialGame::MoveSelectedObject() {
 			if ((testStateObject->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
 				player2freeze = true;
 				p2count = 0;
-				freezeBomb[i]->Respawn(Vector3(150, -25, 150));
+				int index = rand() % route.size();
+				freezeBomb[i]->Respawn(route[index]);
 			}
 			if ((testStateObject2->Position() - freezeBomb[i]->Position()).Length() < 5.0f) {
 				player1freeze = true;
 				p1count = 0;
-				freezeBomb[i]->Respawn(Vector3(150, -25, 150));
+				int index = rand() % route.size();
+				freezeBomb[i]->Respawn(route[index]);
 			}
 			freezeBomb[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), 0.3));
 		}
@@ -1681,7 +1687,7 @@ void TutorialGame::MoveSelectedObject() {
 			p1count++;
 			testStateObject->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			testStateObject->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-			if (p1count >= 500) {
+			if (p1count >= 250) {
 				player1freeze = false;
 			}
 		}
@@ -1690,7 +1696,7 @@ void TutorialGame::MoveSelectedObject() {
 			p2count++;
 			testStateObject2->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			testStateObject2->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
-			if (p2count >= 500) {
+			if (p2count >= 250) {
 				player2freeze = false;
 			}
 		}

@@ -64,6 +64,7 @@ namespace NCL {
 			void TestBehaviourTree();
 
 			vector <Vector3 > seekNodes;
+			vector <Vector3> powerups;
 			std::vector<Vector3> walls;
 			std::vector<Vector3> route;
 			
@@ -89,12 +90,33 @@ namespace NCL {
 				start = testNodes.size();
 			}
 
-			void DisplayPathfinding() {
-				for (int i = 1; i < seekNodes.size(); ++i) {
-					Vector3 a = seekNodes[i - 1];
-					Vector3 b = seekNodes[i];
+			void Path(Vector3 target, Vector3 position, vector<Vector3>& testNodes) {
+				NavigationGrid grid("TestGrid1.txt");
+				walls = grid.GetWalls();
+				route = grid.GetRoute();
+				NavigationPath outPath;
 
-					Debug::DrawLine(a, b, Vector4(0, 1, 0, 1));
+
+				int dist1 = NearestPoint(target);
+				int dist2 = NearestPoint(position);
+				Vector3 startPos = route[dist1]; // Vector3(10, 0, 10);
+				Vector3 endPos = route[dist2];//target; // (290, 0, 290);
+
+				bool found = grid.FindPath(startPos, endPos, outPath);
+
+				Vector3 pos;
+				while (outPath.PopWaypoint(pos)) {
+					testNodes.push_back(pos);
+				}
+				start = testNodes.size();
+			}
+
+			void DisplayPathfinding(vector <Vector3> testNodes, Vector4 colour) {
+				for (int i = 1; i < testNodes.size(); ++i) {
+					Vector3 a = testNodes[i - 1];
+					Vector3 b = testNodes[i];
+
+					Debug::DrawLine(a, b, colour);
 				}
 			}
 
