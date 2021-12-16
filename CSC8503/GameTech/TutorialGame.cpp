@@ -490,12 +490,18 @@ void TutorialGame::InitWorld() {
 		testStateObject2->GetRenderObject()->SetColour(Vector4(1.0, 0.0, 0.0, 1.0));
 		AddWalls();
 		AddPowerUps();
+		AddMazeGoal();
 	}
 }
 
+void TutorialGame::AddMazeGoal() {
+	mazegoal = AddBonusToWorld(Vector3(20, 0, 290));
+}
+
+
 int TutorialGame::NearestPoint(Vector3 position) {
 	int index = route.size();
-	float min = (Vector3(290,0,290) - Vector3(10, 0, 10)).Length();
+	float min = (Vector3(10,0,290) - Vector3(10, 0, 10)).Length();
 	for (int i = 0; i < route.size(); i++) {
 		auto pos = (Vector3(position.x, 0, position.z) - route[i]).Length();
 		if (pos < min) {
@@ -1845,6 +1851,12 @@ void TutorialGame::MoveSelectedObject() {
 				shield[i]->Respawn(route[index]);
 			}
 			shield[i]->SetOrientation(Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -0.3));
+		}
+
+		if ((testStateObject->Position() - mazegoal->Position()).Length() < 7.5f) {
+
+			state = GameState::Level2Score;
+
 		}
 
 		if (player1freeze) {

@@ -171,6 +171,7 @@ namespace NCL {
 			void Addmazefloor();
 			void AddWalls();
 			void AddPowerUps();
+			void AddMazeGoal(); 
 
 			int NearestPoint(Vector3 position);
 			int NearestFB(Vector3 position);
@@ -260,7 +261,7 @@ namespace NCL {
 			GameObject* bounce;
 			GameObject* teleport;
 			GameObject* goal;
-
+			GameObject* mazegoal;
 			vector<GameObject*> obsfloor;
 			vector<GameObject*> mazefloor;
 			vector<GameObject*> mazewalls;
