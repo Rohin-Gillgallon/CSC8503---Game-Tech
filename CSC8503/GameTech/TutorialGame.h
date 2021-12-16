@@ -58,14 +58,19 @@ namespace NCL {
 
 			vector <Vector3 > seekNodes;
 			std::vector<Vector3> walls;
+			std::vector<Vector3> route;
 
 			void TestPathfinding(Vector3 target, vector<Vector3> &testNodes) {
 				NavigationGrid grid("TestGrid1.txt");
 				walls = grid.GetWalls();
+				route = grid.GetRoute();
 				NavigationPath outPath;
 
-				Vector3 startPos = target; // (10, 0, 10);
-				Vector3 endPos(290, 0, 290);
+
+				int dist1 = NearestPoint(testStateObject->Position());
+				int dist2 = NearestPoint(testStateObject2->Position());
+				Vector3 startPos = route[dist1]; // Vector3(10, 0, 10);
+				Vector3 endPos = route[dist2];//target; // (290, 0, 290);
 
 				bool found = grid.FindPath(startPos, endPos, outPath);
 
@@ -134,6 +139,8 @@ namespace NCL {
 
 			void Addmazefloor();
 			void AddWalls();
+
+			int NearestPoint(Vector3 position);
 
 			Vector3 SpawnPoint = Vector3(-100 / 8 * 3, 10, -100 / 8 * 3);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);

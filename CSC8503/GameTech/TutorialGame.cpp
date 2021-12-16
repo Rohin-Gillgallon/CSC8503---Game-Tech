@@ -84,13 +84,14 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	if (state == GameState::Level2) {
-		TestPathfinding(testStateObject->Position(), seekNodes);
+		TestPathfinding(testStateObject2->Position(), seekNodes);
 		DisplayPathfinding();
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
 		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
 		//fleeforce = Flee(seekNodes, testStateObject2->Position(), velocity, start);
 		//testStateObject2->Update(dt, seekforce, fleeforce);
 		TestBehaviourTree();
+		//int dist = NearestPoint(testStateObject->Position());
 		seekNodes.clear();
 	}
 
@@ -354,6 +355,19 @@ void TutorialGame::InitWorld() {
 	}
 }
 
+int TutorialGame::NearestPoint(Vector3 position) {
+	int index = route.size();
+	float min = (Vector3(290,0,290) - Vector3(10, 0, 10)).Length();
+	for (int i = 0; i < route.size(); i++) {
+		auto pos = (Vector3(position.x, 0, position.z) - route[i]).Length();
+		if (pos < min) {
+			min = pos;
+			index = i;
+		}
+	}
+	return index;
+}
+
 void TutorialGame::TestBehaviourTree() {
 	float behaviourTimer;
 	float distanceToTarget;
@@ -460,7 +474,7 @@ void TutorialGame::TestBehaviourTree() {
 	BehaviourSequence* sequence =
 		new BehaviourSequence("Room Sequence");
 	sequence->AddChild(seek);
-	sequence->AddChild(goToRoom);
+	//sequence->AddChild(goToRoom);
 	//sequence->AddChild(openDoor);
 
 	BehaviourSelector* selection =
