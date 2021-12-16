@@ -89,7 +89,8 @@ void TutorialGame::UpdateGame(float dt) {
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
 		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
 		//testStateObject2->Update(dt, seekforce, fleeforce);
-		Path(freezeBomb[0]->Position(), testStateObject2->Position(), powerups);
+		int pu = NearestFB(testStateObject2->Position());
+		Path(freezeBomb[pu]->Position(), testStateObject2->Position(), powerups);
 		fleeforce = Seek(powerups, testStateObject2->Position(), velocity, start);
 		DisplayPathfinding(powerups, Vector4(1, 1, 0, 1));
 		TestBehaviourTree();
@@ -451,6 +452,19 @@ int TutorialGame::NearestPoint(Vector3 position) {
 	return index;
 }
 
+int TutorialGame::NearestFB(Vector3 position) {
+	int index = freezeBomb.size();
+	float min = (Vector3(290, 0, 290) - Vector3(10, 0, 10)).Length();
+	for (int i = 0; i < freezeBomb.size(); i++) {
+		auto pos = (Vector3(position.x, 0, position.z) - freezeBomb[i]->Position()).Length();
+		if (pos < min) {
+			min = pos;
+			index = i;
+		}
+	}
+	return index;
+}
+
 void TutorialGame::TestBehaviourTree() {
 	float behaviourTimer;
 	float distanceToTarget;
@@ -485,15 +499,22 @@ void TutorialGame::TestBehaviourTree() {
 
 			}
 			else if (state == Ongoing) {
-				distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
-				float distanceTopower = (testStateObject2->Position() - freezeBomb[0]->Position()).Length();
-				if (distanceToTarget > distanceTopower) {
-					std::cout << "Aquiring Power Up!\n";
-					testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
-					return Failure;
+				if (!player1freeze) {
+					
+					distanceToTarget = (testStateObject->Position() - testStateObject2->Position()).Length();
+					float distanceTopower = (testStateObject2->Position() - freezeBomb[0]->Position()).Length();
+					if (distanceToTarget > distanceTopower) {
+						std::cout << "Aquiring Power Up!\n";
+						if (fleeforce == Vector3(0, 0, 0)) {
+							return Failure;
+						}
+						testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
+						return Failure;
 
+					}
 				}
-				return Success;
+					return Success;
+				
 			}
 			return state; //will be ’ongoing ’ until success
 		}
@@ -602,9 +623,9 @@ Vector3 TutorialGame::Seek(std::vector<Vector3> target, Vector3 seeker, Vector3 
 		auto l = desired.Length();
 		float speed = 50;
 		Vector3 d = desired / desired.Length() * speed;
-		if (desired.Length() < 5) {
+		if (desired.Length() < 1) {
 			count++;
-			d = (d / speed) * desired.Length();
+			d = (d / speed) *desired.Length();
 		}
 		Vector3 steering = d - velocity;
 		return steering;
@@ -619,7 +640,7 @@ Vector3 TutorialGame::Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 
 		auto l = desired.Length();
 		float speed = 25;
 		Vector3 d = desired / desired.Length() * speed;
-		if (desired.Length() < 5) {
+		if (desired.Length() < 1) {
 			count++;
 			d = (d / speed) * desired.Length();
 		}
@@ -649,7 +670,10 @@ void TutorialGame::AddWalls() {
 }
 
 void TutorialGame::AddPowerUps() {
-	freezeBomb.emplace_back(AddBonusToWorld(route[route.size() - 56] + Vector3(0, 3, 0)));
+	for (int i = 0; i < 10; i++) {
+		int index = rand() % route.size();
+		freezeBomb.emplace_back(AddBonusToWorld(route[route.size() - index] + Vector3(0, 3, 0)));
+	}
 	for (int i = 0; i < freezeBomb.size(); i++) {
 		freezeBomb[i]->GetRenderObject()->SetColour(Vector4(0.1, 0.7, 1.0, 1.0));
 		freezeBomb[i]->GetTransform().SetScale(Vector3(0.5, 0.5, 0.5));
