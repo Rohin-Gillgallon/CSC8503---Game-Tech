@@ -16,7 +16,8 @@ namespace NCL {
 		Level1 = 2,
 		Level1Score = 3,
 		Level2 = 4,
-		Level2Score = 5
+		Level2Score = 5, 
+		Death = 6
 	};
 
 	enum class LevelSelectState {
@@ -195,7 +196,7 @@ namespace NCL {
 			bool Teleport1 = false;
 			bool Teleport2 = false;
 			bool floorisLava = false;
-
+			bool death;
 			bool select1 = true;
 			bool select2 = false;
 			bool quit = false;
@@ -211,7 +212,7 @@ namespace NCL {
 
 			Vector3 stairlift = Vector3(0, 0.1, 0);
 			Vector3 platLift = Vector3(-0.1 * cos(30 * 3.14 / 180), 0.1 * sin(30 * 3.14 / 180), 0);
-			int life = 5;
+			int life;
 			int liftcount = 0;
 			float forceMagnitude;
 			long starttime;

@@ -23,11 +23,12 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	SpawnPoint = Checkpoint5;
+	SpawnPoint = Checkpoint1;
 	Debug::SetRenderer(renderer);
 	state = GameState::Title;
 	InitialiseAssets();
 	count = 1;
+	life = 1;
 }
 
 /*
@@ -117,12 +118,15 @@ void TutorialGame::UpdateGame(float dt) {
 		Vector4 colourl2 = (select2) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourl3 = (quit) ? Vector4(0.2, 0.5, 0.9, 1.0) : Vector4(1.0, 1.0, 1.0, 1.0);
 		Vector4 colourlline;
-		Debug::Print("Please Select Which Level You Would Like To Play", Vector2(10, 10));
+		Debug::Print("Please Select Which Level You Would Like To Play:", Vector2(5, 10));
 		Debug::Print("Press space to select:", Vector2(10, 25));
 		Debug::Print("Level 1: Obstacle Course", Vector2(20, 40), colourl1);
 		Debug::Print("Level 2: Evil Maze", Vector2(20, 60), colourl2);
 		Debug::Print("Quit", Vector2(20, 90), colourl3);
-		if (menu == LevelSelectState::Level1) {
+
+		
+
+ 		if (menu == LevelSelectState::Level1) {
 			int MenuLine = 45;
 			select1 = true;
 			select2 = false;
@@ -194,6 +198,35 @@ void TutorialGame::UpdateGame(float dt) {
 			state = GameState::LevelSelect;
 		}
 	}
+
+	if (state == GameState::Level2Score) {
+
+		renderer->DrawString("Time:" + std::to_string(currenttime),
+			Vector2(40, 20));//Draw debug text at 10,20
+
+		renderer->DrawString("Score:" + std::to_string(score), Vector2(40, 40));
+
+		renderer->DrawString("Return to Menu", Vector2(40, 80));
+		Debug::Print("------------------------------", Vector2(20, 95));
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+		{
+			state = GameState::LevelSelect;
+		}
+	}
+
+	if (state == GameState::Death) {
+		InitWorld();
+		renderer->DrawString("You died, game over",
+			Vector2(40, 20));//Draw debug text at 10,20
+
+		renderer->DrawString("Return to Menu", Vector2(40, 80));
+		Debug::Print("------------------------------", Vector2(20, 95));
+		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
+		{
+			state = GameState::LevelSelect;
+		}
+	}
+
 
 	if (state == GameState::Level1 || state == GameState::Level2) {
 		if (useGravity) {
@@ -423,6 +456,7 @@ void TutorialGame::InitWorld() {
 	
 	if (state == GameState::Level1) {
 		floorisLava = false;
+		death = false;
 		InitDefaultFloor();
 		InitSphereGridWorld(SpawnPoint, 5.0f, 2.0f); 
 		AddSphereToWorld(SpawnPoint + Vector3(0, 10, 0), 1.0f, 2.0f);
@@ -1468,6 +1502,12 @@ bool TutorialGame::SelectObject() {
 				if (world->Raycast(ray, closestCollision, true, selectionObject)) {
 					selectionObject = (GameObject*)closestCollision.node;
 					ActiveObject = selectionObject;
+					auto selpos = ActiveObject->Position();
+					auto sellinvel = ActiveObject->GetPhysicsObject()->GetLinearVelocity();
+					auto selangvel = ActiveObject->GetPhysicsObject()->GetAngularVelocity();
+					renderer->DrawString("Debug Info: position (" + std::to_string(selpos.x) + std::to_string(selpos.y) + std::to_string(selpos.z) + ")", Vector2(20, 30),              Vector4(1,1,1,1) ,15.0f);
+					renderer->DrawString("Debug Info: linear velocity (" + std::to_string(sellinvel.x) + std::to_string(sellinvel.y) + std::to_string(sellinvel.z) + ")", Vector2(20, 40),Vector4(1, 1, 1, 1), 15.0f);
+					renderer->DrawString("Debug Info: angular velocity (" + std::to_string(selangvel.x) + std::to_string(selangvel.y) + std::to_string(selangvel.z) + ")", Vector2(20, 50), Vector4(1, 1, 1, 1), 15.0f);
 					colour = selectionObject->GetRenderObject()->GetColour();
 					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 
@@ -1533,10 +1573,11 @@ void TutorialGame::MoveSelectedObject() {
 		
 		renderer->DrawString("Life:" + std::to_string(life),
 			Vector2(40, 10));
-		if (life == 0) {
-
-		}
+		
 	}
+
+	
+
 	int maxspeed = 50;
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
@@ -1625,6 +1666,16 @@ void TutorialGame::MoveSelectedObject() {
 				if (CollisionDetection::ObjectIntersection(Ball, obsfloor[i], info0))
 				{
 					life--;
+					
+					death = true;
+					
+					if (death) {
+						state = GameState::Death;
+					}
+					
+					
+					Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+					Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 					Ball->Respawn(SpawnPoint);
 				}
 			}
@@ -1744,6 +1795,11 @@ void TutorialGame::MoveSelectedObject() {
 			testStateObject->Respawn(Vector3(10, 0, 10));
 			testStateObject2->Respawn(Vector3(290, 0, 290));
 			life--;
+			death = true;
+
+			if (death) {
+				state = GameState::Death;
+			}
 		}
 
 		for (int i = 0; i < freezeBomb.size(); i++) {
