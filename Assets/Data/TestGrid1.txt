@@ -20,10 +20,10 @@ x.x.x.x...x.x.....x.........x.x
 x.x.x.xxxxx.xxxxx.x.xxxxxxx.x.x
 x.................x.......x...x
 x.xxxxxxx.xxxxxxx.xxxxxxx.x.xxx
-x.......x.x.......x.....x.x...x
+x.......x.........x.....x.x...x
 xxxxxxx.x.x.xxxxxxx.xxx.x.xxx.x
 x.x...x.x.x.........x...x.....x
-x.x.x.x.x.xxxxxxx.xxxxxxx.xxxxx
+x.x.x.x.x.x.xxxxx.xxxxxxx.xxxxx
 x...x...x.........x.....x.....x
 x.xxxxxxxxxxxxxxx.x.xxx.xxxxx.x
 x...x.....x.........x.x.x...x.x
