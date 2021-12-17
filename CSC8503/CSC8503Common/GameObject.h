@@ -33,7 +33,7 @@ namespace NCL {
 				return collision;
 			}
 
-			void setCollsion(bool active) {
+			void setCollision(bool active) {
 				collision = active;
 			}
 

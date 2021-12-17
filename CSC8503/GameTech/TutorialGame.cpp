@@ -23,7 +23,7 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	//SpawnPoint = Checkpoint1;
+	SpawnPoint = Checkpoint5;
 	Debug::SetRenderer(renderer);
 	state = GameState::Title;
 	InitialiseAssets();
@@ -82,6 +82,36 @@ TutorialGame::~TutorialGame()	{
 void TutorialGame::UpdateGame(float dt) {
 	if (!inSelectionMode) {
 		world->GetMainCamera()->UpdateCamera(dt);
+	}
+
+	if (state == GameState::Level1) {
+		if (SpawnPoint == Checkpoint1) {
+			renderer->DrawString("Roll down and ramp, and then press 'T' on teleport", Vector2(20, 40), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Also the floor is lava now, you will die if you touch it", Vector2(20, 50), Vector4(1, 1, 1, 1), 12.5);
+		}
+
+		if (SpawnPoint == Checkpoint2) {
+			bridgeproject = true;
+			renderer->DrawString("Right Arrow to stop rotating platforms", Vector2(20, 35), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Left Arrow to speed up platforms", Vector2(20, 40), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("'J' apply force to ball", Vector2(20, 45), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("'M' to turn on magnet for rotating arm", Vector2(20, 50), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Click on arm to activate rotating arm", Vector2(20, 55), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Then right and left arrows to rotate", Vector2(20, 60), Vector4(1, 1, 1, 1), 12.5);
+		}
+
+		if (SpawnPoint == Checkpoint3) {
+			renderer->DrawString("Click to activate wobbling platform", Vector2(20, 35), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Then all arrow keys to 'wobble", Vector2(20, 40), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("'M' to turn on magnet for lift", Vector2(20, 45), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Then right and left arrows to up and down", Vector2(20, 50), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Click on maze floor to activate maze platform", Vector2(20, 55), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Then all arrow keys to 'wobble", Vector2(20, 60), Vector4(1, 1, 1, 1), 12.5);
+		}
+		if (SpawnPoint == Checkpoint4) {
+			renderer->DrawString("Use mouse to apply force to catch the ball in the constraint net", Vector2(20, 40), Vector4(1, 1, 1, 1), 12.5);
+			renderer->DrawString("Then use mouse again to fire up to platform above", Vector2(20, 45), Vector4(1, 1, 1, 1), 12.5);
+		}
 	}
 
 	if (state == GameState::Level2) {
@@ -241,10 +271,10 @@ void TutorialGame::UpdateGame(float dt) {
 
 	if (state == GameState::Level1) {
 		if (hold) {
-			Debug::Print("(H)old on", Vector2(5, 90));
+			Debug::Print("(M)agnet on", Vector2(5, 90));
 		}
 		else {
-			Debug::Print("(H)old off", Vector2(5, 90));
+			Debug::Print("(M)agnet off", Vector2(5, 90));
 		}
 	}
 
@@ -310,7 +340,6 @@ void TutorialGame::UpdateKeys() {
 			useGravity = true;
 			std::cout << "Checkpoint Reached\n";
 			SpawnPoint = Checkpoint2;
-			bridgeproject = true;
 			Teleport1 = false;
 		}
 		else if (Teleport2) {
@@ -323,7 +352,7 @@ void TutorialGame::UpdateKeys() {
 			return;
 	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::H)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::M)) {
 		hold = !hold;
 	}
 
@@ -767,7 +796,7 @@ void TutorialGame::AddPowerUps() {
 }
 
 void TutorialGame::BridgeConstraintTest() {
-	Vector3 cubeSize = Vector3(1.2, 1.2, 1.2);
+	Vector3 cubeSize = Vector3(1.25, 1.25, 1.25);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
 	int numLinks = 6;
@@ -835,7 +864,7 @@ GameObject* TutorialGame::AddMazeFloorToWorld(const Vector3& position) {
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
-	floor->setCollsion(false);
+	floor->setCollision(false);
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
 
@@ -902,7 +931,7 @@ GameObject* TutorialGame::AddCubeToWorld(const Vector3& position, Vector3 dimens
 	AABBVolume* volume = new AABBVolume(dimensions);
 
 	cube->SetBoundingVolume((CollisionVolume*)volume);
-	cube->setCollsion(active);
+	cube->setCollision(active);
 	cube->GetTransform()
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
@@ -1246,6 +1275,7 @@ void TutorialGame::AddProjectilePlatform() {
 	auto Projplat = AddCubeToWorldOBB(Vector3(123, 100 / 8 + 60, 100 / 8 * 19), Vector3(36, 1, 36), 0);
 	Quaternion rotateproj = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Projplat->SetOrientation(rotateproj);
+	Projplat->GetPhysicsObject()->setRestitution(0.25);
 	auto projplatbase = AddCubeToWorldOBB(Vector3(100, 100 / 8 + 60, 100 / 8 * 18.25), Vector3(1, 9, 27), 0);
 	Quaternion rotateprojbasea = Quaternion::AxisAngleToQuaterion(Vector3(0, 0, 1), 25);
 	Quaternion rotateprojbaseb = Quaternion::AxisAngleToQuaterion(Vector3(0, 1, 0), -15);
@@ -1264,7 +1294,7 @@ void TutorialGame::AddProjectilePlatform() {
 void TutorialGame::AddGravityWell() {
 	gravwell = AddCubeToWorldOBB(Vector3(206, 100 / 8 + 74.5, 100 / 8 * 16), Vector3(50, 1, 50), 0);
 	gravwell->GetPhysicsObject()->gravitywell = true;
-	gravwell->GetPhysicsObject()->SetRestitution(1.5);
+	gravwell->GetPhysicsObject()->setRestitution(1.5);
 }
 
 void TutorialGame::AddBridge() {
@@ -1285,9 +1315,9 @@ void TutorialGame::AddIcePatch() {
 	ice2->GetPhysicsObject()->SetFriction(0.1);
 	auto ice3 = AddCubeToWorld(Vector3(206 + 100 / 8 * 2, 100 / 8 + 20, 100 / 8 * 8), Vector3(100 / 8, 1, 100 / 8), 0);
 	ice3->GetPhysicsObject()->SetFriction(0.1);
-	ice1->GetPhysicsObject()->SetRestitution(0.01);
-	ice2->GetPhysicsObject()->SetRestitution(0.01);
-	ice3->GetPhysicsObject()->SetRestitution(0.01);
+	ice1->GetPhysicsObject()->setRestitution(0.01);
+	ice2->GetPhysicsObject()->setRestitution(0.01);
+	ice3->GetPhysicsObject()->setRestitution(0.01);
 }
 
 void TutorialGame::AddTeleport() {
@@ -1327,9 +1357,9 @@ void TutorialGame::AddBonuses() {
 	bonuses.emplace_back(bonus12);
 	auto bonus13 = AddBonusToWorld(bounce->Position() + Vector3(0, 10, 0));
 	bonuses.emplace_back(bonus13);
-	auto bonus14 = AddBonusToWorld(Vector3(206, 100 / 8 + 30, 100 / 8 * 7));
+	auto bonus14 = AddBonusToWorld(Vector3(206, 100 / 8 + 30, 100 / 8 * 5));
 	bonuses.emplace_back(bonus14);
-	auto bonus15 = AddBonusToWorld(Vector3(206 + 100 / 8 * 3, 100 / 8 + 30, 100 / 8 * 8));
+	auto bonus15 = AddBonusToWorld(Vector3(206 + 100 / 8 * 2, 100 / 8 + 30, 100 / 8 * 8));
 	bonuses.emplace_back(bonus15);
 }
 
@@ -1448,7 +1478,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position) {
 	apple->GetTransform()
 		.SetScale(Vector3(size, size, size))
 		.SetPosition(position);
-	apple->setCollsion(false);
+	apple->setCollision(false);
 	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 	apple->SetName("Bonus");
@@ -1527,9 +1557,9 @@ bool TutorialGame::SelectObject() {
 					auto selpos = ActiveObject->Position();
 					auto sellinvel = ActiveObject->GetPhysicsObject()->GetLinearVelocity();
 					auto selangvel = ActiveObject->GetPhysicsObject()->GetAngularVelocity();
-					renderer->DrawString("Debug Info: position (" + std::to_string(selpos.x) + std::to_string(selpos.y) + std::to_string(selpos.z) + ")", Vector2(20, 30),              Vector4(1,1,1,1) ,15.0f);
-					renderer->DrawString("Debug Info: linear velocity (" + std::to_string(sellinvel.x) + std::to_string(sellinvel.y) + std::to_string(sellinvel.z) + ")", Vector2(20, 40),Vector4(1, 1, 1, 1), 15.0f);
-					renderer->DrawString("Debug Info: angular velocity (" + std::to_string(selangvel.x) + std::to_string(selangvel.y) + std::to_string(selangvel.z) + ")", Vector2(20, 50), Vector4(1, 1, 1, 1), 15.0f);
+					renderer->DrawString("Debug Info: position (" + std::to_string(selpos.x) + ", " + std::to_string(selpos.y) + ", " + std::to_string(selpos.z) + ")", Vector2(20, 30),              Vector4(1,1,1,1) ,15.0f);
+					renderer->DrawString("Debug Info: linear velocity (" + std::to_string(sellinvel.x) + ", " + std::to_string(sellinvel.y) + ", " + std::to_string(sellinvel.z) + ")", Vector2(20, 40),Vector4(1, 1, 1, 1), 15.0f);
+					renderer->DrawString("Debug Info: angular velocity (" + std::to_string(selangvel.x) + ", " + std::to_string(selangvel.y) + ", " + std::to_string(selangvel.z) + ")", Vector2(20, 50), Vector4(1, 1, 1, 1), 15.0f);
 					colour = selectionObject->GetRenderObject()->GetColour();
 					selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 
@@ -1727,7 +1757,7 @@ void TutorialGame::MoveSelectedObject() {
 			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			Ball->Respawn(Vector3(100 / 8 * 16 + 100 / 12, 100 / 8 + 4, 1));
 			useGravity = true;
-			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3500, Vector3(200.149, 12.2566, -2.58092));
+			Ball->GetPhysicsObject()->AddForceAtPosition(Vector3(-0.0930896, -0.164389, 0.981993) * 3000, Vector3(200.149, 12.2566, -2.58092));
 		}
 
 		CollisionDetection::CollisionInfo info3;
@@ -1735,7 +1765,7 @@ void TutorialGame::MoveSelectedObject() {
 			useGravity = false;
 			Ball->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 			Ball->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-			Ball->Respawn(Vector3(206, 100 / 8 + 20, 100 / 8 * 4));
+			Ball->Respawn(floorb->Position() + Vector3(0, 4, 0));
 			useGravity = true;
 		}
 

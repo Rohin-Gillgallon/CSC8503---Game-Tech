@@ -71,7 +71,7 @@ namespace NCL {
 				friction = f;
 			}
 
-			void SetRestitution(float e) {
+			void setRestitution(float e) {
 				elasticity = e;
 			}
 
