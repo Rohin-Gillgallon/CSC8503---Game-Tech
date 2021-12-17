@@ -23,7 +23,7 @@ TutorialGame::TutorialGame()	{
 	useGravity		= false;
 	inSelectionMode = false;
 	rotateFloor = false;
-	SpawnPoint = Checkpoint5;
+	//SpawnPoint = Checkpoint4;
 	Debug::SetRenderer(renderer);
 	state = GameState::Title;
 	InitialiseAssets();
@@ -595,7 +595,7 @@ void TutorialGame::TestBehaviourTree() {
 		}
 	);
 
-	BehaviourAction* goToRoom = new BehaviourAction("Go To Room",
+	BehaviourAction* freeze = new BehaviourAction("Go To Room",
 		[&](float dt, BehaviourState state)->BehaviourState {
 			if (state == Initialise) {
 				//std::cout << "Going to the loot room!\n";
@@ -609,6 +609,10 @@ void TutorialGame::TestBehaviourTree() {
 					if (distanceToTarget > distanceTopower) {
 						std::cout << "Aquiring Power Up!\n";
 						testStateObject2->GetPhysicsObject()->AddForce(fleeforce);
+						if (fleeforce == Vector3(0, 0, 0)) {
+							testStateObject2->GetPhysicsObject()->AddForce(seekforce);
+							return Success;
+						}
 						return Failure;
 
 					}
@@ -620,7 +624,7 @@ void TutorialGame::TestBehaviourTree() {
 		}
 	);
 
-	BehaviourAction* openDoor = new BehaviourAction("Open Door",
+	BehaviourAction* shield = new BehaviourAction("Open Door",
 		[&](float dt, BehaviourState state)->BehaviourState {
 			if (state == Initialise) {
 				//std::cout << "Going to the loot room!\n";
@@ -686,14 +690,14 @@ void TutorialGame::TestBehaviourTree() {
 
 	BehaviourSequence* sequence =
 		new BehaviourSequence("Room Sequence");
-	sequence->AddChild(openDoor);
-	sequence->AddChild(goToRoom);
+	sequence->AddChild(shield);
+	sequence->AddChild(freeze);
 	sequence->AddChild(seek);
 
-	BehaviourSelector* selection =
+	/*BehaviourSelector* selection =
 		new BehaviourSelector("Loot Selection");
 	selection->AddChild(lookForTreasure);
-	selection->AddChild(lookForItems);
+	selection->AddChild(lookForItems);*/
 
 	BehaviourSequence* rootSequence =
 		new BehaviourSequence("Root Sequence");
@@ -796,7 +800,7 @@ void TutorialGame::AddPowerUps() {
 }
 
 void TutorialGame::BridgeConstraintTest() {
-	Vector3 cubeSize = Vector3(1.25, 1.25, 1.25);
+	Vector3 cubeSize = Vector3(1, 1, 1);
 
 	float invCubeMass = 5; //how heavy the middle pieces are
 	int numLinks = 6;
