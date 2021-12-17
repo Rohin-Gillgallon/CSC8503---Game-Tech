@@ -89,11 +89,13 @@ void TutorialGame::UpdateGame(float dt) {
 		DisplayPathfinding(seekNodes, Vector4(0, 1, 0, 1));
 		velocity = testStateObject2->GetPhysicsObject()->GetLinearVelocity();
 		seekforce = Seek(seekNodes, testStateObject2->Position(), velocity, start);
-		//testStateObject2->Update(dt, seekforce, fleeforce);
 		int pu = NearestFB(testStateObject2->Position());
 		Path(freezeBomb[pu]->Position(), testStateObject2->Position(), powerups);
 		fleeforce = Seek(powerups, testStateObject2->Position(), velocity, start);
 		DisplayPathfinding(powerups, Vector4(1, 1, 0, 1));
+		int getshield = NearestShield(testStateObject->Position());
+		Path(freezeBomb[getshield]->Position(), testStateObject2->Position(), powerups);
+		shieldforce = Seek(powerups, testStateObject2->Position(), velocity, start);
 		TestBehaviourTree();
 		//int dist = NearestPoint(testStateObject->Position());
 		seekNodes.clear();
@@ -191,8 +193,8 @@ void TutorialGame::UpdateGame(float dt) {
 
 		renderer->DrawString("Score:" + std::to_string(score), Vector2(40, 40));
 
-		renderer->DrawString("Return to Menu", Vector2(40, 80));
-		Debug::Print("------------------------------", Vector2(20, 95));
+		renderer->DrawString("Return to Menu (Space)", Vector2(40, 80));
+		Debug::Print("----------------------", Vector2(40, 85));
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
 		{
 			state = GameState::LevelSelect;
@@ -206,8 +208,8 @@ void TutorialGame::UpdateGame(float dt) {
 
 		renderer->DrawString("Score:" + std::to_string(score), Vector2(40, 40));
 
-		renderer->DrawString("Return to Menu", Vector2(40, 80));
-		Debug::Print("------------------------------", Vector2(20, 95));
+		renderer->DrawString("Return to Menu (Space)", Vector2(40, 80));
+		Debug::Print("----------------------", Vector2(40, 85));
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
 		{
 			state = GameState::LevelSelect;
@@ -219,8 +221,8 @@ void TutorialGame::UpdateGame(float dt) {
 		renderer->DrawString("You died, game over",
 			Vector2(40, 20));//Draw debug text at 10,20
 
-		renderer->DrawString("Return to Menu", Vector2(40, 80));
-		Debug::Print("------------------------------", Vector2(20, 95));
+		renderer->DrawString("Return to Menu (Space)", Vector2(40, 80));
+		Debug::Print("----------------------", Vector2(40, 85));
 		if (Window::GetKeyboard()->KeyPressed(KeyboardKeys::SPACE))
 		{
 			state = GameState::LevelSelect;
@@ -525,6 +527,19 @@ int TutorialGame::NearestFB(Vector3 position) {
 	return index;
 }
 
+int TutorialGame::NearestShield(Vector3 position) {
+	int index = shield.size();
+	float min = (Vector3(290, 0, 290) - Vector3(10, 0, 10)).Length();
+	for (int i = 0; i < shield.size(); i++) {
+		auto pos = (Vector3(position.x, 0, position.z) - shield[i]->Position()).Length();
+		if (pos < min) {
+			min = pos;
+			index = i;
+		}
+	}
+	return index;
+}
+
 void TutorialGame::TestBehaviourTree() {
 	float behaviourTimer;
 	float distanceToTarget;
@@ -585,7 +600,8 @@ void TutorialGame::TestBehaviourTree() {
 			}
 			else if (state == Ongoing) {
 				if (player1up) {
-					return Success;
+					testStateObject2->GetPhysicsObject()->AddForce(shieldforce);
+					return Failure;
 				}
 				return Success;
 

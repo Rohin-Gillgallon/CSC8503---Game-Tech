@@ -125,6 +125,7 @@ namespace NCL {
 			Vector3 Flee(std::vector<Vector3> target, Vector3 seeker, Vector3 velocity, int start);
 			Vector3 velocity;
 			Vector3 seekforce;
+			Vector3 shieldforce;
 			Vector3 fleeforce;
 			GameObject* AddFloorToWorld(const Vector3& position);
 			GameObject* AddMazeFloorToWorld(const Vector3& position);
@@ -175,6 +176,7 @@ namespace NCL {
 
 			int NearestPoint(Vector3 position);
 			int NearestFB(Vector3 position);
+			int NearestShield(Vector3 position);
 
 			Vector3 SpawnPoint = Vector3(-100 / 8 * 3, 10, -100 / 8 * 3);
 			Vector3 Checkpoint1 = Vector3(100 / 8 * 12.25, 100 / 8 * 4 + 10, -100 / 8 * 3);
