@@ -54,4 +54,4 @@ This project demonstrates advanced game engine programming, focusing on custom p
 4. Build the solution and run in Release mode for optimal physics performance.
 
 ---
-Author: Rohin Gillgallon****
+Author: Rohin Gillgallon
